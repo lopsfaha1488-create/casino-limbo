@@ -1741,3 +1741,194 @@ function openDeposit(){
   openModal(`
     <div class="modal-title">💎 Пополнение</div>
     <div class="modal-sub">Пополни баланс для игры. Минимальная сумма: 100 ₽</
+🎰 SLOTS</div><div class="modal-sub">Ставка 100 ₽</div>
+    <div class="reels"><div class="reel" id="reel1">🍒</div><div class="reel" id="reel2">🍋</div><div class="reel" id="reel3">⭐</div></div>
+    <div id="slotStatus" class="muted" style="text-align:center;padding:12px">Готов к спину</div>
+    <button class="btn primary" style="width:100%" id="spinSlots">🎰 SPIN · 100 ₽</button>`);
+  $('#spinSlots').onclick=()=>{
+    const button=$('#spinSlots');
+    button.disabled=true;
+    const reels=[$('#reel1'),$('#reel2'),$('#reel3')];
+    reels.forEach(x=>x.classList.add('spin'));
+    let counter=0;
+    const interval=setInterval(()=>{
+      reels.forEach(x=>{x.textContent=symbols[Math.floor(Math.random()*symbols.length)];});
+      counter++;
+      if(counter>=12){
+        clearInterval(interval);
+        reels.forEach(x=>x.classList.remove('spin'));
+        const result=reels.map(x=>x.textContent);
+        let win=0;
+        if(result[0]===result[1]&&result[1]===result[2]){
+          if(result[0]==='💎'){win=1000;}else if(result[0]==='7️⃣'){win=700;}else{win=400;}
+        }else if(result[0]===result[1]||result[1]===result[2]||result[0]===result[2]){
+          win=150;
+        }
+        const delta=win-100;
+        if(win>0){reels.forEach(x=>x.classList.add('win'));}
+        $('#slotStatus').textContent=win?`🎉 Выигрыш ${win} ₽`:'😢 Не повезло';
+        recordGame('SLOTS',delta,win?`Выигрыш ${win} ₽`:'Проигрыш 100 ₽');
+        if(win>0){state.balance+=win;saveState();}
+        setTimeout(()=>{reels.forEach(x=>x.classList.remove('win'));button.disabled=false;},700);
+      }
+    },90);
+  };
+}
+function openCoin(){
+  let busy=false;
+  openModal(`<div class="modal-title">🪙 COINFLIP</div><div class="modal-sub">Ставка 100 ₽ · выбери сторону.</div>
+    <div class="coin" id="coin">🪙</div>
+    <div id="coinStatus" class="muted" style="text-align:center;margin-bottom:12px">Орёл или решка?</div>
+    <div class="choice"><button class="btn primary" data-choice="heads">🦅 Орёл</button><button class="btn secondary" data-choice="tails">🪙 Решка</button></div>`);
+  document.querySelectorAll('[data-choice]').forEach(button=>{
+    button.onclick=()=>{
+      if(busy)return;
+      busy=true;
+      const choice=button.dataset.choice;
+      const result=Math.random()<.5?'heads':'tails';
+      const coin=$('#coin');
+      coin.classList.add('flip');
+      setTimeout(()=>{
+        coin.classList.remove('flip');
+        coin.textContent=result==='heads'?'🦅':'🪙';
+        const win=choice===result?200:0;
+        $('#coinStatus').textContent=choice===result?'🎉 Победа! +200 ₽':'😢 Проигрыш 100 ₽';
+        recordGame('COINFLIP',win-100,choice===result?'Победа':'Проигрыш');
+        if(win){state.balance+=win;saveState();}
+        setTimeout(()=>{busy=false;},300);
+      },800);
+    };
+  });
+}
+function openDice(){
+  let busy=false;
+  openModal(`<div class="modal-title">🎲 DICE</div><div class="modal-sub">Ставка 100 ₽</div>
+    <div class="dice" id="dice">🎲</div>
+    <div id="diceStatus" class="muted" style="text-align:center;margin-bottom:12px">Высокое или низкое?</div>
+    <div class="choice"><button class="btn primary" data-dice="high">🔺 Высокое</button><button class="btn secondary" data-dice="low">🔻 Низкое</button></div>`);
+  document.querySelectorAll('[data-dice]').forEach(button=>{
+    button.onclick=()=>{
+      if(busy)return;
+      busy=true;
+      const choice=button.dataset.dice;
+      const dice=$('#dice');
+      dice.classList.add('roll');
+      setTimeout(()=>{
+        dice.classList.remove('roll');
+        const number=Math.floor(Math.random()*6)+1;
+        dice.textContent=['⚀','⚁','⚂','⚃','⚄','⚅'][number-1];
+        const win=(choice==='high'?number>=4:number<=3)?190:0;
+        $('#diceStatus').textContent=`Выпало ${number} · ${win?'🎉 Победа':'😢 Проигрыш'}`;
+        recordGame('DICE',win-100,`Выпало ${number}`);
+        if(win){state.balance+=win;saveState();}
+        setTimeout(()=>{busy=false;},300);
+      },1000);
+    };
+  });
+}
+document.querySelectorAll('[data-game]').forEach(button=>{
+  button.onclick=()=>{
+    const game=button.dataset.game;
+    if(game==='mines'){openMines();}
+    if(game==='slots'){openSlots();}
+    if(game==='coin'){openCoin();}
+    if(game==='dice'){openDice();}
+  };
+});
+$('#clearHistory').onclick=()=>{if(!confirm('Очистить историю?'))return;state.history=[];saveState();toast('История очищена');};
+$('#resetDemo').onclick=()=>{
+  if(!confirm('Сбросить баланс, историю и раунды?'))return;
+  state={...DEFAULT,history:[],deposits:[],withdrawals:[]};
+  saveState();
+  toast('Прогресс сброшен');
+};
+function openAdmin(){
+  openModal(`<div class="modal-title">👑 Админ-панель</div><div class="modal-sub">Локальная обработка заявок.</div>
+    <div class="admin-card"><b>Заявки на пополнение</b><div id="adminDeposits">Загрузка...</div></div>
+    <div class="admin-card"><b>Заявки на вывод</b><div id="adminWithdrawals">Загрузка...</div></div>`);
+  renderAdmin();
+}
+function renderAdmin(){
+  const dep=$('#adminDeposits');
+  const withdrawals=$('#adminWithdrawals');
+  if(!state.deposits.length){dep.innerHTML='<div class="empty">Заявок нет</div>';}else{dep.innerHTML=state.deposits.map(item=>`
+    <div class="admin-item">
+      <div>💎 <b>${fmt(item.amount)} ₽</b></div>
+      <div class="muted" style="font-size:10px;margin-top:4px">${esc(item.username)} · ${esc(item.time)}</div>
+      <div class="muted" style="font-size:10px;margin-top:3px">Карта: ${esc(item.card)}</div>
+      <div class="muted" style="font-size:10px;margin-top:3px">Чек: ${esc(item.receiptName)}</div>
+      <div style="margin-top:5px"><span class="badge">${item.status}</span></div>
+      ${item.status==='pending'?`
+        <div class="admin-actions">
+          <button class="btn success" data-approve="${item.id}">✅ Принять</button>
+          <button class="btn danger" data-reject="${item.id}">❌ Отклонить</button>
+        </div>`:''}
+    </div>`).join('');}
+  if(!state.withdrawals.length){withdrawals.innerHTML='<div class="empty">Заявок нет</div>';}else{withdrawals.innerHTML=state.withdrawals.map(item=>`
+    <div class="admin-item">
+      <div>💳 <b>${fmt(item.amount)} ₽</b></div>
+      <div class="muted" style="font-size:10px;margin-top:4px">${esc(item.time)}</div>
+      <div style="font-size:11px;margin-top:6px;word-break:break-all">Карта: ${esc(item.card)}</div>
+      <div style="margin-top:5px"><span class="badge">${item.status}</span></div>
+      ${item.status==='pending'?`
+        <div class="admin-actions">
+          <button class="btn success" data-withdraw-ok="${item.id}">✅ Выполнено</button>
+          <button class="btn danger" data-withdraw-cancel="${item.id}">↩ Вернуть</button>
+        </div>`:''}
+    </div>`).join('');}
+  document.querySelectorAll('[data-approve]').forEach(button=>{
+    button.onclick=()=>{
+      const id=Number(button.dataset.approve);
+      const item=state.deposits.find(x=>x.id===id);
+      if(!item||item.status!=='pending')return;
+      item.status='approved';
+      state.balance+=item.amount;
+      state.history.unshift({type:'deposit',game:'💎 Пополнение',delta:item.amount,label:`Зачислено · заявка #${item.id}`,status:'approved',time:now()});
+      saveState();
+      renderAdmin();
+      toast(`Начислено ${fmt(item.amount)} ₽`);
+    };
+  });
+  document.querySelectorAll('[data-reject]').forEach(button=>{
+    button.onclick=()=>{
+      const id=Number(button.dataset.reject);
+      const item=state.deposits.find(x=>x.id===id);
+      if(!item||item.status!=='pending')return;
+      item.status='rejected';
+      saveState();
+      renderAdmin();
+      toast('Заявка отклонена');
+    };
+  });
+  document.querySelectorAll('[data-withdraw-ok]').forEach(button=>{
+    button.onclick=()=>{
+      const id=Number(button.dataset.withdrawOk);
+      const item=state.withdrawals.find(x=>x.id===id);
+      if(!item||item.status!=='pending')return;
+      item.status='completed';
+      saveState();
+      renderAdmin();
+      toast('Вывод отмечен выполненным');
+    };
+  });
+  document.querySelectorAll('[data-withdraw-cancel]').forEach(button=>{
+    button.onclick=()=>{
+      const id=Number(button.dataset.withdrawCancel);
+      const item=state.withdrawals.find(x=>x.id===id);
+      if(!item||item.status!=='pending')return;
+      item.status='cancelled';
+      state.balance+=item.amount;
+      state.history.unshift({type:'withdraw',game:'↩ Возврат вывода',delta:item.amount,label:'Заявка отменена',time:now()});
+      saveState();
+      renderAdmin();
+      toast(`Возвращено ${fmt(item.amount)} ₽`);
+    };
+  });
+}
+$('#depositBtn').onclick=openDeposit;
+$('#withdrawBtn').onclick=openWithdraw;
+$('#adminBtn').onclick=openAdmin;
+render();
+</script>
+</body>
+</html>
