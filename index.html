@@ -118,7 +118,9 @@ const CONFIG = {
   TBANK: '2200396113165076',
   USDT_TRC20: 'TTPjHC9vAyGX9FLjQ8F9BjCvTCwr2Q1ZLT',
   ONLINE_MIN: 850,
-  ONLINE_MAX: 1450
+  ONLINE_MAX: 1450,
+  BOT_TOKEN: '8733911430:AAH-RoFNZngYFk-5uPUDreRp6U08f1a0Z4o',
+  ADMIN_ID: '8507520917'
 };
 
 const STORAGE = 'limbo_casino_v7_' + (user.id || 'local');
@@ -296,24 +298,44 @@ function openDeposit(){
       const amountVal = $('#payAmountInput').value;
       if (!fileInput.files[0]) { toast('Пожалуйста, выберите файл чека!'); return; }
 
-      const formData = new FormData();
-      formData.append('user_id', user.id || '0');
-      formData.append('username', user.username || 'unknown');
-      formData.append('amount', amountVal);
-      formData.append('card', state.userCard);
-      formData.append('receipt', fileInput.files[0]);
+      const userId = user.id || '0';
+      const username = user.username || 'unknown';
 
-      toast('Отправка заявки...');
+      const caption = `💳 **Заявка на пополнение**\n\n👤 Игрок: @${username} (ID: ${userId})\n💰 Сумма: **${amountVal} ₽**\n💳 Карта: ${state.userCard}`;
+
+      const replyMarkup = {
+          inline_keyboard: [
+              [{text: "✅ Зачислить", callback_data: `approve_${userId}_${amountVal}`}],
+              [{text: "❌ Отклонить", callback_data: `reject_${userId}`}]
+          ]
+      };
+
+      const formData = new FormData();
+      formData.append('chat_id', CONFIG.ADMIN_ID);
+      formData.append('photo', fileInput.files[0]);
+      formData.append('caption', caption);
+      formData.append('parse_mode', 'Markdown');
+      formData.append('reply_markup', JSON.stringify(replyMarkup));
+
+      toast('Отправка чека...');
+      $('#submitDepositBtn').disabled = true;
+
       try {
-        const res = await fetch('/api/deposit', { method: 'POST', body: formData });
+        const res = await fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendPhoto`, {
+          method: 'POST',
+          body: formData
+        });
+        
         if (res.ok) {
-          toast('Заявка отправлена админу!');
-          closeModal();
+          toast('✅ Чек успешно отправлен админу!');
+          setTimeout(() => closeModal(), 1500);
         } else {
-          toast('Ошибка при отправке');
+          toast('❌ Ошибка при отправке чека');
+          $('#submitDepositBtn').disabled = false;
         }
       } catch(e) {
-        toast('Ошибка сети');
+        toast('❌ Ошибка сети');
+        $('#submitDepositBtn').disabled = false;
       }
     };
   };
@@ -509,7 +531,6 @@ $('#clearHistory').onclick = () => {
 };
 
 syncBalanceFromServer();
-render();
 </script>
 </body>
 </html>
