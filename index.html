@@ -899,4 +899,64 @@
             msg = `✅ Пара! +${win} ₽`;
         } else {
             win = -slotBet;
-            msg = `
+            msg = `😞 Проигрыш! -${slotBet} ₽`;
+        }
+        setBalance(balance + win);
+        document.getElementById('slotMsg').textContent = msg;
+    }
+
+    function initSlots() {}
+
+    // ========== ДЕПОЗИТ ==========
+    function copyDeposit() {
+        const text = document.getElementById('depositAddress').textContent;
+        navigator.clipboard?.writeText(text);
+        tg.showAlert('✅ Адрес скопирован');
+    }
+
+    function confirmDeposit() {
+        const amount = document.getElementById('depositAmount').value;
+        const status = document.getElementById('depositStatus');
+        if (!amount || parseInt(amount) < 500) {
+            status.textContent = '❌ Минимальная сумма 500 ₽';
+            status.style.color = '#ff4444';
+            return;
+        }
+        status.textContent = '✅ Заявка отправлена! Ожидайте подтверждения.';
+        status.style.color = '#00cc66';
+        tg.sendData(JSON.stringify({
+            action: 'deposit',
+            amount: parseInt(amount)
+        }));
+        setTimeout(() => { status.textContent = ''; }, 5000);
+    }
+
+    // ========== ВЫВОД ==========
+    function requestWithdraw() {
+        const amount = document.getElementById('withdrawAmount').value;
+        if (!amount || parseInt(amount) < 500) {
+            tg.showAlert('❌ Минимальная сумма 500 ₽');
+            return;
+        }
+        if (parseInt(amount) > balance) {
+            tg.showAlert('❌ Недостаточно средств');
+            return;
+        }
+        tg.sendData(JSON.stringify({
+            action: 'withdraw',
+            amount: parseInt(amount)
+        }));
+        tg.showAlert('✅ Заявка на вывод отправлена!');
+    }
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    updateUI();
+    tg.ready();
+
+    // Получаем баланс от бота при загрузке
+    tg.sendData(JSON.stringify({
+        action: 'getBalance'
+    }));
+</script>
+</body>
+</html>
