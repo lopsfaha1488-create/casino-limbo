@@ -166,21 +166,43 @@ async function sendToAdmin(text){
 function paymentCard(title,detail,warning=''){
 return `<div class="requisites"><div class="req-title">${title}</div><div class="req-number">${detail}</div>${warning?`<div class="muted" style="font-size:10px;margin-top:6px">${warning}</div>`:''}<button class="btn secondary copy-btn" data-copy="${esc(detail)}">📋 Скопировать реквизиты</button></div>`
 }
+
 function openDeposit(){
 let method='bank',amount=1000;
-const isCardBound = !!state.userCard;
+let step = state.userCard ? 2 : 1;
 
 const renderPay=()=>{
-openModal(`<div class="modal-title">💎 Пополнение</div><div class="modal-sub">Укажите карту и сумму перевода (мин. 1000 ₽)</div>
+if(step === 1){
+  openModal(`<div class="modal-title">💎 Пополнение</div>
+  <div class="modal-sub">Шаг 1: Привяжите банковскую карту для совершения депозитов и вывода средств</div>
+  <div class="label" style="margin-top:13px">Укажите номер вашей карты</div>
+  <input class="input" id="userCardInput" type="text" placeholder="0000 0000 0000 0000" value="${esc(state.userCard)}">
+  <button class="btn primary" style="width:100%;margin-top:12px" id="saveCardBtn">Продолжить ➔</button>`);
+
+  $('#saveCardBtn').onclick=()=>{
+    const cardVal = $('#userCardInput').value.trim();
+    if(!cardVal || cardVal.length < 16){
+      toast('Введите корректный номер карты (не менее 16 цифр)!');
+      return;
+    }
+    state.userCard = cardVal;
+    saveState();
+    step = 2;
+    renderPay();
+  };
+  return;
+}
+
+openModal(`<div class="modal-title">💎 Пополнение</div><div class="modal-sub">Выберите способ пополнения и укажите сумму (мин. 1000 ₽)</div>
 <div class="choice"><button class="btn ${method==='bank'?'primary':'secondary'}" id="payBank">💳 Карта</button><button class="btn ${method==='crypto'?'primary':'secondary'}" id="payCrypto">₮ USDT TRC20</button></div>
 
-<div class="label" style="margin-top:13px">Ваша карта для оплаты и вывода</div>
-<input class="input" id="userCardInput" type="text" placeholder="0000 0000 0000 0000" value="${esc(state.userCard)}" ${isCardBound?'disabled':''}>
-${isCardBound?'<div class="muted" style="font-size:10px;margin-bottom:8px;color:var(--green)">✓ Карта привязана к аккаунту</div>':''}
+<div class="label" style="margin-top:13px">Привязанная карта</div>
+<input class="input" type="text" value="${esc(state.userCard)}" disabled>
+<div class="muted" style="font-size:10px;margin-bottom:8px;color:var(--green)">✓ Карта привязана к аккаунту</div>
 
 <div class="label" style="margin-top:5px">Сумма</div><div class="chips">${[1000,3000,5000,10000].map(a=>`<button class="chip ${a===amount?'active':''}" data-amount="${a}">${a} ₽</button>`).join('')}</div>
 <input class="input" id="customAmount" type="number" min="1000" placeholder="Сумма от 1000 ₽" value="${amount}">
-${method==='bank'?paymentCard('КАРТА ДЛЯ ПЕРЕВОДА',CONFIG.TBANK,'Переводите точную сумму на реквизиты выше.') : paymentCard('USDT · TRC20',CONFIG.USDT_TRC20,'⚠️ Сеть: TRON (TRC20). Не отправляй токены другой сети.')}
+${method==='bank'?paymentCard('РЕКВИЗИТЫ ДЛЯ ПЕРЕВОДА',CONFIG.TBANK,'Переводите точную сумму на карту выше.') : paymentCard('USDT · TRC20',CONFIG.USDT_TRC20,'⚠️ Сеть: TRON (TRC20). Не отправляй токены другой сети.')}
 <div class="upload-box"><b>🧾 Чек</b><div class="muted" style="font-size:10px;margin-top:5px">При необходимости прикрепи подтверждение перевода.</div><input id="receiptInput" type="file" accept="image/*"><img id="receiptPreview" class="preview"></div>
 <button class="btn primary" style="width:100%;margin-top:12px" id="sendDeposit">📤 Отправить заявку</button>`);
 
@@ -191,24 +213,18 @@ document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{try{awai
 $('#receiptInput').onchange=e=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=x=>{$('#receiptPreview').src=x.target.result;$('#receiptPreview').style.display='block'};r.readAsDataURL(f)};
 
 $('#sendDeposit').onclick=async()=>{
-  const cardVal = $('#userCardInput').value.trim();
-  if(!cardVal || cardVal.length < 16){toast('Введите корректный номер карты!');return}
   if(!amount||amount<1000){toast('Минимум 1000 ₽');return}
-  
-  if(!state.userCard) {
-    state.userCard = cardVal;
-  }
 
   const msg = `📥 <b>ЗАЯВКА НА ПОПОЛНЕНИЕ</b>\n\n` +
               `👤 <b>Игрок:</b> ${user.first_name||'Player'} (${user.username?'@'+user.username:'без ника'})\n` +
               `🆔 <b>ID:</b> <code>${user.id||'неизвестен'}</code>\n` +
-              `💳 <b>Карта игрока:</b> <code>${cardVal}</code>\n` +
+              `💳 <b>Карта игрока:</b> <code>${state.userCard}</code>\n` +
               `💰 <b>Сумма:</b> ${fmt(amount)} ₽\n` +
               `🌐 <b>Способ:</b> ${method==='bank'?'Карта':'USDT TRC20'}`;
 
   const sent = await sendToAdmin(msg);
   if(sent){
-    state.deposits.unshift({id:Date.now(),amount,method,status:'pending',time:now(),card:cardVal});
+    state.deposits.unshift({id:Date.now(),amount,method,status:'pending',time:now(),card:state.userCard});
     state.history.unshift({type:'deposit',game:'💎 Пополнение',delta:0,label:`${fmt(amount)} ₽ · заявка`,time:now()});
     state.history=state.history.slice(0,50);
     saveState();
