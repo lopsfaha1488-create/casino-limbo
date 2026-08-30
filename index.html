@@ -57,7 +57,6 @@ button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
 .modal-title{font-size:23px;font-weight:950}.modal-sub{font-size:12px;color:var(--muted);margin:4px 0 13px}.input{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:#0b0711;color:#fff;outline:0;margin:7px 0}.input:focus{border-color:var(--purple)}.input:disabled{opacity:0.6;border-color:#332644}
 .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 12px}.chip{border:1px solid var(--line);background:#1a1325;border-radius:10px;padding:9px 4px;font-size:11px;font-weight:800;color:var(--muted)}.chip.active{background:rgba(255,63,159,.16);border-color:var(--pink);color:#fff}
 .requisites{margin-top:12px;padding:15px;border-radius:15px;background:#0b0711;border:1px solid var(--line)}.req-title{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px}.req-number{font-size:19px;font-weight:900;margin-top:7px;word-break:break-all}.copy-btn{width:100%;margin-top:9px}
-.upload-box{margin-top:12px;border:1px dashed #59486c;border-radius:14px;padding:16px;text-align:center;background:#0b0711}.preview{max-width:100%;max-height:220px;border-radius:12px;margin-top:10px;display:none}
 .mine-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:13px 0}.mine-cell{aspect-ratio:1;border:1px solid var(--line);border-radius:11px;background:linear-gradient(145deg,#21172e,#151020);font-size:20px;display:flex;align-items:center;justify-content:center;transition:.18s}.mine-cell.safe{background:rgba(93,240,162,.1);border-color:var(--green);box-shadow:inset 0 0 18px rgba(93,240,162,.06)}.mine-cell.mine{background:rgba(255,93,115,.12);border-color:var(--red);animation:mineBoom .45s ease}
 .mine-settings{display:flex;gap:8px;align-items:center;justify-content:center;margin:10px 0}.mine-settings button{width:38px;height:38px;border-radius:10px;background:#1a1325;border:1px solid var(--line);font-size:20px;font-weight:800}.mine-settings span{font-size:22px;font-weight:950;min-width:42px;text-align:center;color:var(--pink)}
 .betbox{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0;padding:11px;border:1px solid var(--line);border-radius:13px;background:#0b0711}.betbox b{font-size:15px}.betcontrols{display:flex;gap:5px}.betcontrols button{border:1px solid var(--line);background:#181022;border-radius:8px;padding:6px 9px;font-size:10px}
@@ -135,50 +134,73 @@ button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
 
 <script>
 'use strict';
-const API_URL = "https://casino-backend-ic35.onrender.com";
 
-const tg=window.Telegram?.WebApp||null;
-try{tg?.ready();tg?.expand?.();tg?.setHeaderColor?.('#07040d');tg?.setBackgroundColor?.('#07040d')}catch(e){}
-const user=tg?.initDataUnsafe?.user||{};
+const tg = window.Telegram?.WebApp || null;
+try { tg?.ready(); tg?.expand?.(); tg?.setHeaderColor?.('#07040d'); tg?.setBackgroundColor?.('#07040d'); } catch(e){}
+const user = tg?.initDataUnsafe?.user || {};
 
-const CONFIG={
-  BOT_TOKEN:'8733911430:AAF0y4vZM-E1JoiS9PkgHSF8aBE5BcZsfzY',
-  ADMIN_ID:8507520917,
-  START_BALANCE:0,
-  DEFAULT_BET:100,
-  MIN_BET:100,
-  MAX_BET:10000,
-  MINES_MIN:1,
-  MINES_MAX:23,
-  ONLINE_MIN:850,
-  ONLINE_MAX:1450,
-  TBANK:'2200396113165076',
-  USDT_TRC20:'TVXDnmrHUeR7WeYM8AvbK41N94awx9EHw',
-  PAYMENT_NAME:'CASINO LIMBO'
+const CONFIG = {
+  START_BALANCE: 0,
+  DEFAULT_BET: 100,
+  MIN_BET: 100,
+  MAX_BET: 10000,
+  TBANK: '2200396113165076',
+  USDT_TRC20: 'TTPjHC9vAyGX9FLjQ8F9BjCvTCwr2Q1ZLT',
+  ONLINE_MIN: 850,
+  ONLINE_MAX: 1450
 };
 
-const STORAGE='limbo_casino_v6_'+(user.id||'local');
-const DEFAULT={balance:CONFIG.START_BALANCE,rounds:0,net:0,history:[],deposits:[],withdrawals:[],userCard:'',registered:false,nickname:'',password:''};
-let state=loadState();
+const STORAGE = 'limbo_casino_v6_' + (user.id || 'local');
+const DEFAULT = { balance: CONFIG.START_BALANCE, rounds: 0, net: 0, history: [], userCard: '', registered: false, nickname: '', password: '' };
+let state = loadState();
 
-function loadState(){try{const s=JSON.parse(localStorage.getItem(STORAGE)||'null');return {...DEFAULT,...(s||{}),history:s?.history||[],deposits:s?.deposits||[],withdrawals:s?.withdrawals||[]}}catch{return {...DEFAULT}}}
-function saveState(){localStorage.setItem(STORAGE,JSON.stringify(state));render()}
-function $(s){return document.querySelector(s)}
-function fmt(n){return new Intl.NumberFormat('ru-RU').format(Math.round(Number(n)||0))}
-function money(n){n=Number(n)||0;return `${n>=0?'+':''}${fmt(n)} ₽`}
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]) )}
-function now(){return new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
-function toast(msg){const e=$('#toast');e.textContent=msg;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2500)}
-function openModal(html){$('#modalContent').innerHTML=html;$('#modal').classList.add('open');document.body.style.overflow='hidden'}
-function closeModal(){$('#modal').classList.remove('open');document.body.style.overflow=''}
-$('#close').onclick=closeModal;$('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()}
-
-// Функция получения текущего баланса с бэкенда Render
-async function syncBalanceFromServer() {
-  const telegramId = user.id || state.nickname;
-  if (!telegramId) return;
+function loadState(){
   try {
-    const res = await fetch(`${API_URL}/api/user/${telegramId}`);
+    const s = JSON.parse(localStorage.getItem(STORAGE) || 'null');
+    return { ...DEFAULT, ...(s || {}), history: s?.history || [] };
+  } catch {
+    return { ...DEFAULT };
+  }
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE, JSON.stringify(state));
+  render();
+}
+
+function $(s){ return document.querySelector(s); }
+function fmt(n){ return new Intl.NumberFormat('ru-RU').format(Math.round(Number(n) || 0)); }
+function money(n){ n = Number(n) || 0; return `${n >= 0 ? '+' : ''}${fmt(n)} ₽`; }
+function esc(v){ return String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+function now(){ return new Date().toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+
+function toast(msg){
+  const e = $('#toast');
+  e.textContent = msg;
+  e.classList.add('show');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => e.classList.remove('show'), 2500);
+}
+
+function openModal(html){
+  $('#modalContent').innerHTML = html;
+  $('#modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  $('#modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+$('#close').onclick = closeModal;
+$('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
+
+// Синхронизация баланса с единым Flask API бота
+async function syncBalanceFromServer() {
+  if (!user.id) return;
+  try {
+    const res = await fetch(`/api/balance?user_id=${user.id}`);
     if (res.ok) {
       const data = await res.json();
       if (typeof data.balance === 'number' && data.balance !== state.balance) {
@@ -189,266 +211,338 @@ async function syncBalanceFromServer() {
   } catch(e) {}
 }
 
-// Запуск фоновой синхронизации каждые 3 секунды
 setInterval(syncBalanceFromServer, 3000);
 
-// Проверка и форма регистрации
 function checkAuth(){
-  if(!state.registered){
-    $('#authScreen').style.display='flex';
+  if (!state.registered) {
+    $('#authScreen').style.display = 'flex';
   } else {
-    $('#authScreen').style.display='none';
+    $('#authScreen').style.display = 'none';
     syncBalanceFromServer();
   }
 }
 
-$('#submitReg').onclick=async()=>{
+$('#submitReg').onclick = () => {
   const nick = $('#regNickname').value.trim();
   const pass = $('#regPassword').value.trim();
-  if(!nick || nick.length < 3){
-    toast('Введите никнейм (мин. 3 символа)');
-    return;
-  }
-  if(!pass || pass.length < 4){
-    toast('Введите пароль (мин. 4 символа)');
-    return;
-  }
+  if (!nick || nick.length < 3) { toast('Введите никнейм (мин. 3 символа)'); return; }
+  if (!pass || pass.length < 4) { toast('Введите пароль (мин. 4 символа)'); return; }
+
   state.registered = true;
   state.nickname = nick;
   state.password = pass;
   saveState();
-  
-  // Автоматическая регистрация/создание профиля на бэкенде Render
-  try {
-    await fetch(`${API_URL}/api/user/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        telegramId: user.id || nick,
-        username: user.username || nick,
-        first_name: user.first_name || nick
-      })
-    });
-  } catch(e) {}
 
-  $('#authScreen').style.display='none';
+  $('#authScreen').style.display = 'none';
   celebrate();
   toast('Успешная регистрация!');
 };
 
 function updateUser(){
-  $('#profileId').textContent=user.id||'—';
-  $('#profileUsername').textContent=user.username?'@'+user.username:'—';
-  $('#profileName').textContent=state.nickname || [user.first_name,user.last_name].filter(Boolean).join(' ')||'Player';
-  $('#profileRegNick').textContent=state.nickname || '—';
-  $('#profileBalance').textContent=fmt(state.balance);
+  $('#profileId').textContent = user.id || '—';
+  $('#profileUsername').textContent = user.username ? '@' + user.username : '—';
+  $('#profileName').textContent = state.nickname || [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Player';
+  $('#profileRegNick').textContent = state.nickname || '—';
+  $('#profileBalance').textContent = fmt(state.balance);
 }
 
 function render(){
-  $('#balance').textContent=fmt(state.balance);$('#rounds').textContent=state.rounds;$('#profileRounds').textContent=state.rounds;$('#profit').textContent=money(state.net);$('#sessionNet').textContent=money(state.net);updateUser();
-  const h=$('#historyList');h.innerHTML=state.history.length?state.history.map(x=>`<div class="history-item"><div><b>${esc(x.game)}</b><div class="muted" style="font-size:9px;margin-top:3px">${esc(x.time)} · ${esc(x.label)}</div></div><b class="${x.delta>=0?'win':'loss'}">${money(x.delta)}</b></div>`).join(''):'<div class="empty">📭 Пока нет действий</div>';
+  $('#balance').textContent = fmt(state.balance);
+  $('#rounds').textContent = state.rounds;
+  $('#profileRounds').textContent = state.rounds;
+  $('#profit').textContent = money(state.net);
+  $('#sessionNet').textContent = money(state.net);
+  updateUser();
+
+  const h = $('#historyList');
+  h.innerHTML = state.history.length 
+    ? state.history.map(x => `<div class="history-item"><div><b>${esc(x.game)}</b><div class="muted" style="font-size:9px;margin-top:3px">${esc(x.time)} · ${esc(x.label)}</div></div><b class="${x.delta >= 0 ? 'win' : 'loss'}">${money(x.delta)}</b></div>`).join('')
+    : '<div class="empty">📭 Пока нет действий</div>';
 }
 
-function recordGame(game,delta,label){state.rounds++;state.net+=delta;state.history.unshift({type:'game',game,delta,label,time:now()});state.history=state.history.slice(0,50);saveState()}
-function spendBet(bet){if(state.balance<bet){toast('Недостаточно средств');return false}state.balance-=bet;return true}
-function winPayout(amount){state.balance+=amount}
-function celebrate(){const box=$('#confetti');box.innerHTML='';for(let i=0;i<42;i++){const x=document.createElement('i');x.style.left=Math.random()*100+'%';x.style.setProperty('--x',(Math.random()*240-120)+'px');x.style.animationDelay=Math.random()*.35+'s';x.style.background=['#ff3f9f','#7c5cff','#45e9ff','#ffd76a','#5df0a2'][Math.floor(Math.random()*5)];box.appendChild(x)}setTimeout(()=>box.innerHTML='',2200)}
-
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.tab+'Section').classList.add('active')});
-let online=1024;function tickOnline(){online=Math.max(CONFIG.ONLINE_MIN,Math.min(CONFIG.ONLINE_MAX,online+Math.floor(Math.random()*31)-15));$('#onlineCount').textContent=fmt(online)}setInterval(tickOnline,2500);tickOnline();
-
-function paymentCard(title,detail,warning=''){
-  return `<div class="requisites"><div class="req-title">${title}</div><div class="req-number">${detail}</div>${warning?`<div class="muted" style="font-size:10px;margin-top:6px">${warning}</div>`:''}<button class="btn secondary copy-btn" data-copy="${esc(detail)}">📋 Скопировать реквизиты</button></div>`
+function recordGame(game, delta, label){
+  state.rounds++;
+  state.net += delta;
+  state.history.unshift({ type: 'game', game, delta, label, time: now() });
+  state.history = state.history.slice(0, 50);
+  saveState();
 }
 
-// Пополнение баланса с отправкой данных на Render Бэкенд
+function spendBet(bet){
+  if (state.balance < bet) { toast('Недостаточно средств'); return false; }
+  state.balance -= bet;
+  return true;
+}
+
+function winPayout(amount){ state.balance += amount; }
+
+function celebrate(){
+  const box = $('#confetti');
+  box.innerHTML = '';
+  for (let i = 0; i < 42; i++) {
+    const x = document.createElement('i');
+    x.style.left = Math.random() * 100 + '%';
+    x.style.setProperty('--x', (Math.random() * 240 - 120) + 'px');
+    x.style.animationDelay = Math.random() * .35 + 's';
+    x.style.background = ['#ff3f9f', '#7c5cff', '#45e9ff', '#ffd76a', '#5df0a2'][Math.floor(Math.random() * 5)];
+    box.appendChild(x);
+  }
+  setTimeout(() => box.innerHTML = '', 2200);
+}
+
+document.querySelectorAll('.nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.nav button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+  $('#' + b.dataset.tab + 'Section').classList.add('active');
+});
+
+let online = 1024;
+function tickOnline(){
+  online = Math.max(CONFIG.ONLINE_MIN, Math.min(CONFIG.ONLINE_MAX, online + Math.floor(Math.random() * 31) - 15));
+  $('#onlineCount').textContent = fmt(online);
+}
+setInterval(tickOnline, 2500);
+tickOnline();
+
+function paymentCard(title, detail, warning = ''){
+  return `<div class="requisites"><div class="req-title">${title}</div><div class="req-number">${detail}</div>${warning ? `<div class="muted" style="font-size:10px;margin-top:6px">${warning}</div>` : ''}<button class="btn secondary copy-btn" data-copy="${esc(detail)}">📋 Скопировать реквизиты</button></div>`;
+}
+
+// Пополнение и Вывод
 function openDeposit(){
-let method='bank',amount=1000;
-let step = state.userCard ? 2 : 1;
+  let method = 'bank', amount = 1000;
+  let step = state.userCard ? 2 : 1;
 
-const renderPay=()=>{
-if(step === 1){
-  openModal(`<div class="modal-title">💎 Пополнение</div>
-  <div class="modal-sub">Шаг 1: Привяжите банковскую карту для совершения депозитов и вывода средств</div>
-  <div class="label" style="margin-top:13px">Укажите номер вашей карты</div>
-  <input class="input" id="userCardInput" type="text" placeholder="0000 0000 0000 0000" value="${esc(state.userCard)}">
-  <button class="btn primary" style="width:100%;margin-top:12px" id="saveCardBtn">Продолжить ➔</button>`);
+  const renderPay = () => {
+    if (step === 1) {
+      openModal(`<div class="modal-title">💎 Пополнение</div>
+      <div class="modal-sub">Привяжите карту для удобного пополнения и вывода</div>
+      <div class="label" style="margin-top:13px">Укажите номер вашей карты</div>
+      <input class="input" id="userCardInput" type="text" placeholder="0000 0000 0000 0000" value="${esc(state.userCard)}">
+      <button class="btn primary" style="width:100%;margin-top:12px" id="saveCardBtn">Продолжить ➔</button>`);
 
-  $('#saveCardBtn').onclick=()=>{
-    const cardVal = $('#userCardInput').value.trim();
-    if(!cardVal || cardVal.length < 16){
-      toast('Введите корректный номер карты!');
+      $('#saveCardBtn').onclick = () => {
+        const cardVal = $('#userCardInput').value.trim();
+        if (!cardVal || cardVal.length < 16) { toast('Введите корректный номер карты!'); return; }
+        state.userCard = cardVal;
+        saveState();
+        step = 2;
+        renderPay();
+      };
       return;
     }
-    state.userCard = cardVal;
-    saveState();
-    step = 2;
-    renderPay();
+
+    openModal(`<div class="modal-title">💎 Пополнение</div><div class="modal-sub">Выберите способ пополнения в боте Telegram</div>
+    <div class="choice"><button class="btn ${method === 'bank' ? 'primary' : 'secondary'}" id="payBank">💳 Карта</button><button class="btn ${method === 'crypto' ? 'primary' : 'secondary'}" id="payCrypto">₮ USDT TRC20</button></div>
+    <div class="label" style="margin-top:13px">Привязанная карта</div>
+    <input class="input" type="text" value="${esc(state.userCard)}" disabled>
+    ${method === 'bank' ? paymentCard('РЕКВИЗИТЫ ДЛЯ ПЕРЕВОДА', CONFIG.TBANK, 'Переводите точную сумму на карту выше.') : paymentCard('USDT · TRC20', CONFIG.USDT_TRC20, '⚠️ Сеть: TRON (TRC20).')}
+    <button class="btn primary" style="width:100%;margin-top:12px" id="closePayBtn">Понятно</button>`);
+
+    $('#payBank').onclick = () => { method = 'bank'; renderPay(); };
+    $('#payCrypto').onclick = () => { method = 'crypto'; renderPay(); };
+    $('#closePayBtn').onclick = closeModal;
+    document.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy); toast('Скопировано'); } catch { toast('Ошибка копирования'); }
+    });
   };
-  return;
+  renderPay();
 }
 
-openModal(`<div class="modal-title">💎 Пополнение</div><div class="modal-sub">Выберите способ пополнения и укажите сумму (мин. 1000 ₽)</div>
-<div class="choice"><button class="btn ${method==='bank'?'primary':'secondary'}" id="payBank">💳 Карта</button><button class="btn ${method==='crypto'?'primary':'secondary'}" id="payCrypto">₮ USDT TRC20</button></div>
-
-<div class="label" style="margin-top:13px">Привязанная карта</div>
-<input class="input" type="text" value="${esc(state.userCard)}" disabled>
-<div class="muted" style="font-size:10px;margin-bottom:8px;color:var(--green)">✓ Карта привязана к аккаунту</div>
-
-<div class="label" style="margin-top:5px">Сумма</div><div class="chips">${[1000,3000,5000,10000].map(a=>`<button class="chip ${a===amount?'active':''}" data-amount="${a}">${a} ₽</button>`).join('')}</div>
-<input class="input" id="customAmount" type="number" min="1000" placeholder="Сумма от 1000 ₽" value="${amount}">
-${method==='bank'?paymentCard('РЕКВИЗИТЫ ДЛЯ ПЕРЕВОДА',CONFIG.TBANK,'Переводите точную сумму на карту выше.') : paymentCard('USDT · TRC20',CONFIG.USDT_TRC20,'⚠️ Сеть: TRON (TRC20). Не отправляй токены другой сети.')}
-<button class="btn primary" style="width:100%;margin-top:12px" id="sendDeposit">📤 Отправить заявку</button>`);
-
-document.querySelectorAll('[data-amount]').forEach(b=>b.onclick=()=>{amount=Number(b.dataset.amount);renderPay()});
-$('#customAmount').oninput=e=>{const v=Number(e.target.value);if(v>=1000)amount=v};
-$('#payBank').onclick=()=>{method='bank';renderPay()};$('#payCrypto').onclick=()=>{method='crypto';renderPay()};
-document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copy);toast('Скопировано')}catch{toast('Не удалось скопировать')}});
-
-$('#sendDeposit').onclick=async()=>{
-  if(!amount||amount<1000){toast('Минимум 1000 ₽');return}
-
-  try {
-    const res = await fetch(`${API_URL}/api/deposit`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        telegramId: user.id || state.nickname,
-        username: user.username || 'без ника',
-        firstName: user.first_name || 'Player',
-        nickname: state.nickname,
-        password: state.password,
-        userCard: state.userCard,
-        amount: amount,
-        method: method === 'bank' ? 'Карта' : 'USDT TRC20'
-      })
-    });
-
-    if(res.ok){
-      state.deposits.unshift({id:Date.now(),amount,method,status:'pending',time:now(),card:state.userCard});
-      state.history.unshift({type:'deposit',game:'💎 Пополнение',delta:0,label:`${fmt(amount)} ₽ · заявка`,time:now()});
-      state.history=state.history.slice(0,50);
-      saveState();
-      closeModal();
-      toast('Заявка отправлена админу!');
-    } else {
-      toast('Ошибка при отправке заявки');
-    }
-  } catch(e) {
-    toast('Ошибка соединения с сервером');
-  }
-};
-};renderPay();
-}
-
-// Запрос вывода на Render Бэкенд
 function openWithdraw(){
-if(!state.userCard){toast('Сначала сделайте депозит для привязки карты!');return}
-if(!state.balance){toast('Баланс пуст');return}
-
-openModal(`<div class="modal-title">💳 Вывод</div><div class="modal-sub">Вывод доступен только на привязанную карту</div>
-<div class="panel"><div class="row"><span>Доступно</span><b>${fmt(state.balance)} ₽</b></div></div>
-<div class="label" style="margin-top:10px">Привязанная карта</div>
-<input class="input" type="text" value="${esc(state.userCard)}" disabled>
-<input id="withdrawAmount" class="input" type="number" min="100" placeholder="Сумма вывода">
-<button class="btn primary" style="width:100%;margin-top:10px" id="sendWithdraw">📤 Запросить вывод</button>`);
-
-$('#sendWithdraw').onclick=async()=>{
-  const a=Number($('#withdrawAmount').value);
-  if(a<100){toast('Минимум 100 ₽');return}
-  if(a>state.balance){toast('Недостаточно средств');return}
-  
-  try {
-    const res = await fetch(`${API_URL}/api/withdraw`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        telegramId: user.id || state.nickname,
-        username: user.username || 'без ника',
-        firstName: user.first_name || 'Player',
-        nickname: state.nickname,
-        userCard: state.userCard,
-        amount: a
-      })
-    });
-
-    if(res.ok){
-      state.balance -= a;
-      state.withdrawals.unshift({id:Date.now(),amount:a,status:'pending',time:now(),card:state.userCard});
-      state.history.unshift({type:'withdraw',game:'💳 Вывод',delta:-a,label:`Заявка ${fmt(a)} ₽`,time:now()});
-      state.history=state.history.slice(0,50);
-      saveState();
-      closeModal();
-      toast('Заявка на вывод отправлена!');
-    } else {
-      toast('Ошибка отправки заявки');
-    }
-  } catch(e) {
-    toast('Ошибка соединения с сервером');
-  }
-}
+  if (!state.userCard) { toast('Сначала привяжите карту!'); return; }
+  openModal(`<div class="modal-title">💳 Вывод</div><div class="modal-sub">Вывод производится через главное меню Telegram бота</div>
+  <div class="panel"><div class="row"><span>Доступно</span><b>${fmt(state.balance)} ₽</b></div></div>
+  <div class="label" style="margin-top:10px">Привязанная карта</div>
+  <input class="input" type="text" value="${esc(state.userCard)}" disabled>
+  <button class="btn primary" style="width:100%;margin-top:12px" id="closeWBtn">Понятно</button>`);
+  $('#closeWBtn').onclick = closeModal;
 }
 
-// Игры
+$('#depositBtn').onclick = openDeposit;
+$('#withdrawBtn').onclick = openWithdraw;
+
+// Игры: MINES, SLOTS, COINFLIP, DICE
 function openMines(){
-let mineCount=3,bet=CONFIG.DEFAULT_BET,opened=0,over=false,mult=1,mineIndexes=[];
-function newMines(){mineIndexes=[];while(mineIndexes.length<mineCount){const i=Math.floor(Math.random()*25);if(!mineIndexes.includes(i))mineIndexes.push(i)}}
-function draw(){const grid=$('#mineGrid');if(!grid)return;grid.innerHTML=Array.from({length:25},(_,i)=>`<button class="mine-cell" data-mine="${i}">?</button>`).join('');grid.querySelectorAll('[data-mine]').forEach(c=>c.onclick=()=>clickCell(c))}
-function reset(){opened=0;over=false;mult=1;$('#cashoutMine').disabled=true;$('#mineStatus').textContent='Открыто: 0 · x1.00';draw()}
-function start(){if(!spendBet(bet))return;newMines();reset();$('#startMine').disabled=true;$('#mineStatus').textContent=`Игра начата · ${mineCount} мин`;saveState()}
-function clickCell(cell){if(over)return;const i=Number(cell.dataset.mine);if(mineIndexes.includes(i)){cell.textContent='💣';cell.classList.add('mine');document.querySelectorAll('[data-mine]').forEach(x=>{if(mineIndexes.includes(Number(x.dataset.mine)))x.textContent='💣';x.disabled=true});over=true;recordGame('MINES',-bet,'Мина · ставка списана');$('#mineStatus').textContent='💥 Мина!';$('#startMine').disabled=false;return}cell.textContent='💎';cell.classList.add('safe');cell.disabled=true;opened++;mult=1+(opened*(0.14+mineCount*.012));const payout=Math.floor(bet*mult);$('#mineStatus').textContent=`Открыто: ${opened} · x${mult.toFixed(2)} · ${payout} ₽`;$('#cashoutMine').disabled=false}
-function cashout(){if(over||!opened)return;const payout=Math.floor(bet*mult);over=true;document.querySelectorAll('[data-mine]').forEach(x=>x.disabled=true);winPayout(payout);recordGame('MINES',payout,`Выигрыш ${payout} ₽`);saveState();celebrate();toast(`🎉 +${fmt(payout)} ₽`);$('#mineStatus').textContent=`🎉 Забрано ${fmt(payout)} ₽`;$('#cashoutMine').disabled=true;$('#startMine').disabled=false}
-openModal(`<div class="modal-title">💣 MINES</div><div class="modal-sub">Выбор мин: <b>1–23</b> · поле 5×5</div>
-<div class="mine-settings"><button id="mineDec">−</button><span id="mineCountDisplay">${mineCount}</span><button id="mineInc">+</button></div>
-<div class="betbox"><span>Ставка</span><b id="mineBet">${bet} ₽</b><div class="betcontrols"><button id="betMinus">−100</button><button id="betPlus">+100</button></div></div>
-<div class="mine-grid" id="mineGrid"></div><div class="panel" style="text-align:center"><b id="mineStatus">Готово · x1.00</b></div>
-<div class="choice"><button class="btn primary" id="startMine">🚀 Начать</button><button class="btn success" id="cashoutMine" disabled>💰 Забрать</button></div>`);
-newMines();draw();
-$('#mineDec').onclick=()=>{if(over||mineCount<=1)return;mineCount--;$('#mineCountDisplay').textContent=mineCount;newMines();draw()};
-$('#mineInc').onclick=()=>{if(over||mineCount>=23)return;mineCount++;$('#mineCountDisplay').textContent=mineCount;newMines();draw()};
-$('#betMinus').onclick=()=>{bet=Math.max(CONFIG.MIN_BET,bet-100);$('#mineBet').textContent=fmt(bet)+' ₽'};
-$('#betPlus').onclick=()=>{bet=Math.min(CONFIG.MAX_BET,bet+100);$('#mineBet').textContent=fmt(bet)+' ₽'};
-$('#startMine').onclick=start;$('#cashoutMine').onclick=cashout;
+  let mineCount = 3, bet = CONFIG.DEFAULT_BET, opened = 0, over = false, mult = 1, mineIndexes = [];
+  function newMines(){ mineIndexes = []; while (mineIndexes.length < mineCount) { const i = Math.floor(Math.random() * 25); if (!mineIndexes.includes(i)) mineIndexes.push(i); } }
+  function draw(){ const grid = $('#mineGrid'); if (!grid) return; grid.innerHTML = Array.from({ length: 25 }, (_, i) => `<button class="mine-cell" data-mine="${i}">?</button>`).join(''); grid.querySelectorAll('[data-mine]').forEach(c => c.onclick = () => clickCell(c)); }
+  function reset(){ opened = 0; over = false; mult = 1; $('#cashoutMine').disabled = true; $('#mineStatus').textContent = 'Открыто: 0 · x1.00'; draw(); }
+  function start(){ if (!spendBet(bet)) return; newMines(); reset(); $('#startMine').disabled = true; $('#mineStatus').textContent = `Игра начата · ${mineCount} мин`; saveState(); }
+  function clickCell(cell){
+    if (over) return;
+    const i = Number(cell.dataset.mine);
+    if (mineIndexes.includes(i)) {
+      cell.textContent = '💣'; cell.classList.add('mine');
+      document.querySelectorAll('[data-mine]').forEach(x => { if (mineIndexes.includes(Number(x.dataset.mine))) x.textContent = '💣'; x.disabled = true; });
+      over = true; recordGame('MINES', -bet, 'Мина · ставка списана'); $('#mineStatus').textContent = '💥 Мина!'; $('#startMine').disabled = false; return;
+    }
+    cell.textContent = '💎'; cell.classList.add('safe'); cell.disabled = true; opened++;
+    mult = 1 + (opened * (0.14 + mineCount * .012));
+    const payout = Math.floor(bet * mult);
+    $('#mineStatus').textContent = `Открыто: ${opened} · x${mult.toFixed(2)} · ${payout} ₽`; $('#cashoutMine').disabled = false;
+  }
+  function cashout(){
+    if (over || !opened) return;
+    const payout = Math.floor(bet * mult); over = true;
+    document.querySelectorAll('[data-mine]').forEach(x => x.disabled = true);
+    winPayout(payout); recordGame('MINES', payout, `Выигрыш ${payout} ₽`); saveState(); celebrate();
+    toast(`🎉 +${fmt(payout)} ₽`); $('#mineStatus').textContent = `🎉 Забрано ${fmt(payout)} ₽`; $('#cashoutMine').disabled = true; $('#startMine').disabled = false;
+  }
+
+  openModal(`<div class="modal-title">💣 MINES</div><div class="modal-sub">Выбор мин: <b>1–23</b> · поле 5×5</div>
+  <div class="mine-settings"><button id="mineDec">−</button><span id="mineCountDisplay">${mineCount}</span><button id="mineInc">+</button></div>
+  <div class="betbox"><span>Ставка</span><b id="mineBet">${bet} ₽</b><div class="betcontrols"><button id="betMinus">−100</button><button id="betPlus">+100</button></div></div>
+  <div class="mine-grid" id="mineGrid"></div><div class="panel" style="text-align:center"><b id="mineStatus">Готово · x1.00</b></div>
+  <div class="choice"><button class="btn primary" id="startMine">🚀 Начать</button><button class="btn success" id="cashoutMine" disabled>💰 Забрать</button></div>`);
+  newMines(); draw();
+  $('#mineDec').onclick = () => { if (over || mineCount <= 1) return; mineCount--; $('#mineCountDisplay').textContent = mineCount; newMines(); draw(); };
+  $('#mineInc').onclick = () => { if (over || mineCount >= 23) return; mineCount++; $('#mineCountDisplay').textContent = mineCount; newMines(); draw(); };
+  $('#betMinus').onclick = () => { bet = Math.max(CONFIG.MIN_BET, bet - 100); $('#mineBet').textContent = fmt(bet) + ' ₽'; };
+  $('#betPlus').onclick = () => { bet = Math.min(CONFIG.MAX_BET, bet + 100); $('#mineBet').textContent = fmt(bet) + ' ₽'; };
+  $('#startMine').onclick = start; $('#cashoutMine').onclick = cashout;
 }
 
 function openSlots(){
-const symbols=['🍒','🍋','🍉','⭐','7️⃣','💎'];let bet=100,busy=false;
-openModal(`<div class="modal-title">🎰 SLOTS</div><div class="modal-sub">Три барабана · ставка <b id="slotBet">${bet} ₽</b></div><div class="reels"><div class="reel" id="reel1">🍒</div><div class="reel" id="reel2">🍋</div><div class="reel" id="reel3">⭐</div></div><div id="slotStatus" class="muted" style="text-align:center;padding:12px">Готов к спину</div><div class="betcontrols" style="justify-content:center;margin-bottom:9px"><button id="slotMinus">−100</button><button id="slotPlus">+100</button></div><button class="btn primary" style="width:100%" id="spinSlots">🎰 SPIN</button>`);
-$('#slotMinus').onclick=()=>{bet=Math.max(100,bet-100);$('#slotBet').textContent=fmt(bet)+' ₽'};$('#slotPlus').onclick=()=>{bet=Math.min(CONFIG.MAX_BET,bet+100);$('#slotBet').textContent=fmt(bet)+' ₽'};
-$('#spinSlots').onclick=()=>{if(busy||!spendBet(bet))return;busy=true;const btn=$('#spinSlots'),rs=[$('#reel1'),$('#reel2'),$('#reel3')];btn.disabled=true;rs.forEach(x=>x.classList.add('spin'));let c=0;const it=setInterval(()=>{rs.forEach(x=>x.textContent=symbols[Math.floor(Math.random()*symbols.length)]);if(++c>=16){clearInterval(it);rs.forEach(x=>x.classList.remove('spin'));const r=rs.map(x=>x.textContent);if(r[0]===r[1]&&r[1]===r[2]){const win=bet*5;winPayout(win);recordGame('SLOTS',win-bet,`ДЖЕКПOТ ${r[0]}!`);celebrate();toast(`🎉 ДЖЕКПOТ +${fmt(win)} ₽`);$('#slotStatus').textContent=`🎉 ДЖЕКПOТ! +${fmt(win)} ₽`}else if(r[0]===r[1]||r[1]===r[2]||r[0]===r[2]){const win=Math.floor(bet*1.5);winPayout(win);recordGame('SLOTS',win-bet,'Совпадение пара');toast(`+${fmt(win)} ₽`);$('#slotStatus').textContent=`Пара! +${fmt(win)} ₽`}else{recordGame('SLOTS',-bet,'Не повезло');$('#slotStatus').textContent='Попробуй еще раз!'}btn.disabled=false;busy=false}},80)}
+  const symbols = ['🍒', '🍋', '🍉', '⭐', '7️⃣', '💎'];
+  let bet = 100, busy = false;
+  openModal(`<div class="modal-title">🎰 SLOTS</div><div class="modal-sub">Три барабана · ставка <b id="slotBet">${bet} ₽</b></div>
+  <div class="reels"><div class="reel" id="reel1">🍒</div><div class="reel" id="reel2">🍋</div><div class="reel" id="reel3">⭐</div></div>
+  <div id="slotStatus" class="muted" style="text-align:center;padding:12px">Готов к спину</div>
+  <div class="betcontrols" style="justify-content:center;margin-bottom:9px"><button id="slotMinus">−100</button><button id="slotPlus">+100</button></div>
+  <button class="btn primary" style="width:100%" id="spinSlots">🎰 SPIN</button>`);
+
+  $('#slotMinus').onclick = () => { bet = Math.max(100, bet - 100); $('#slotBet').textContent = fmt(bet) + ' ₽'; };
+  $('#slotPlus').onclick = () => { bet = Math.min(CONFIG.MAX_BET, bet + 100); $('#slotBet').textContent = fmt(bet) + ' ₽'; };
+  $('#spinSlots').onclick = () => {
+    if (busy || !spendBet(bet)) return;
+    busy = true; saveState();
+    const r1 = $('#reel1'), r2 = $('#reel2'), r3 = $('#reel3');
+    [r1, r2, r3].forEach(r => { r.className = 'reel spin'; });
+    setTimeout(() => {
+      const s1 = symbols[Math.floor(Math.random() * symbols.length)];
+      const s2 = symbols[Math.floor(Math.random() * symbols.length)];
+      const s3 = symbols[Math.floor(Math.random() * symbols.length)];
+      r1.className = 'reel'; r1.textContent = s1;
+      r2.className = 'reel'; r2.textContent = s2;
+      r3.className = 'reel'; r3.textContent = s3;
+      busy = false;
+
+      if (s1 === s2 && s2 === s3) {
+        const payout = bet * 5;
+        winPayout(payout); celebrate();
+        [r1, r2, r3].forEach(r => r.classList.add('win'));
+        recordGame('SLOTS', payout, 'ДЖЕКПОТ x5');
+        $('#slotStatus').textContent = `🎉 ДЖЕКПОТ! +${fmt(payout)} ₽`;
+      } else if (s1 === s2 || s2 === s3 || s1 === s3) {
+        const payout = Math.floor(bet * 1.5);
+        winPayout(payout);
+        recordGame('SLOTS', payout, 'Пара x1.5');
+        $('#slotStatus').textContent = `✨ Выигрыш! +${fmt(payout)} ₽`;
+      } else {
+        recordGame('SLOTS', -bet, 'Проигрыш');
+        $('#slotStatus').textContent = '❌ Не повезло';
+      }
+      saveState();
+    }, 800);
+  };
 }
 
 function openCoin(){
-let bet=100,choice='heads',busy=false;
-openModal(`<div class="modal-title">🪙 COINFLIP</div><div class="modal-sub">Орёл или Решка · <b>x1.95</b></div><div class="coin" id="coin">👑</div><div class="choice" style="margin-bottom:10px"><button class="btn primary" id="pickHeads">👑 Орёл</button><button class="btn secondary" id="pickTails">🦅 Решка</button></div><div class="betbox"><span>Ставка</span><b id="coinBet">${bet} ₽</b><div class="betcontrols"><button id="coinMinus">−100</button><button id="coinPlus">+100</button></div></div><button class="btn primary" style="width:100%" id="flipCoin">🪙 Бросить монету</button>`);
-$('#pickHeads').onclick=()=>{choice='heads';$('#pickHeads').className='btn primary';$('#pickTails').className='btn secondary'};
-$('#pickTails').onclick=()=>{choice='tails';$('#pickTails').className='btn primary';$('#pickHeads').className='btn secondary'};
-$('#coinMinus').onclick=()=>{bet=Math.max(100,bet-100);$('#coinBet').textContent=fmt(bet)+' ₽'};$('#coinPlus').onclick=()=>{bet=Math.min(CONFIG.MAX_BET,bet+100);$('#coinBet').textContent=fmt(bet)+' ₽'};
-$('#flipCoin').onclick=()=>{if(busy||!spendBet(bet))return;busy=true;const c=$('#coin');c.classList.add('flip');setTimeout(()=>{c.classList.remove('flip');const res=Math.random()>.5?'heads':'tails';c.textContent=res==='heads'?'👑':'🦅';if(res===choice){const win=Math.floor(bet*1.95);winPayout(win);recordGame('COINFLIP',win-bet,'Угадал');celebrate();toast(`🎉 +${fmt(win)} ₽`)}else{recordGame('COINFLIP',-bet,'Не угадал');toast('Мимо!')}busy=false},800)}
+  let bet = 100, choice = 'heads', busy = false;
+  openModal(`<div class="modal-title">🪙 COINFLIP</div><div class="modal-sub">Орёл или Решка</div>
+  <div class="coin" id="coinIcon">🦅</div>
+  <div class="choice" style="margin-bottom:10px"><button class="btn primary" id="btnHeads">🦅 Орёл</button><button class="btn secondary" id="btnTails">🪙 Решка</button></div>
+  <div class="betbox"><span>Ставка</span><b id="coinBet">${bet} ₽</b><div class="betcontrols"><button id="coinMinus">−100</button><button id="coinPlus">+100</button></div></div>
+  <button class="btn primary" style="width:100%" id="flipCoin">🪙 Бросить монету</button>`);
+
+  $('#btnHeads').onclick = () => { choice = 'heads'; $('#btnHeads').className = 'btn primary'; $('#btnTails').className = 'btn secondary'; };
+  $('#btnTails').onclick = () => { choice = 'tails'; $('#btnTails').className = 'btn primary'; $('#btnHeads').className = 'btn secondary'; };
+  $('#coinMinus').onclick = () => { bet = Math.max(100, bet - 100); $('#coinBet').textContent = fmt(bet) + ' ₽'; };
+  $('#coinPlus').onclick = () => { bet = Math.min(CONFIG.MAX_BET, bet + 100); $('#coinBet').textContent = fmt(bet) + ' ₽'; };
+  $('#flipCoin').onclick = () => {
+    if (busy || !spendBet(bet)) return;
+    busy = true; saveState();
+    const coin = $('#coinIcon');
+    coin.classList.add('flip');
+    setTimeout(() => {
+      coin.classList.remove('flip');
+      const win = Math.random() > 0.5;
+      const res = win ? choice : (choice === 'heads' ? 'tails' : 'heads');
+      coin.textContent = res === 'heads' ? '🦅' : '🪙';
+      busy = false;
+
+      if (res === choice) {
+        const payout = bet * 2;
+        winPayout(payout); celebrate();
+        recordGame('COINFLIP', payout, 'Угадал x2');
+        toast(`🎉 Угадал! +${fmt(payout)} ₽`);
+      } else {
+        recordGame('COINFLIP', -bet, 'Не угадал');
+        toast('❌ Не угадал');
+      }
+      saveState();
+    }, 800);
+  };
 }
 
 function openDice(){
-let bet=100,busy=false;
-openModal(`<div class="modal-title">🎲 DICE</div><div class="modal-sub">Выпадение 4–6 = выигрыш <b>x1.9</b></div><div class="dice" id="dice">🎲</div><div class="betbox"><span>Ставка</span><b id="diceBet">${bet} ₽</b><div class="betcontrols"><button id="diceMinus">−100</button><button id="dicePlus">+100</button></div></div><button class="btn primary" style="width:100%" id="rollDice">🎲 Бросить кубик</button>`);
-$('#diceMinus').onclick=()=>{bet=Math.max(100,bet-100);$('#diceBet').textContent=fmt(bet)+' ₽'};$('#dicePlus').onclick=()=>{bet=Math.min(CONFIG.MAX_BET,bet+100);$('#diceBet').textContent=fmt(bet)+' ₽'};
-$('#rollDice').onclick=()=>{if(busy||!spendBet(bet))return;busy=true;const d=$('#dice');d.classList.add('roll');setTimeout(()=>{d.classList.remove('roll');const val=Math.floor(Math.random()*6)+1;d.textContent=['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣'][val-1];if(val>=4){const win=Math.floor(bet*1.9);winPayout(win);recordGame('DICE',win-bet,`Выпало ${val}`);celebrate();toast(`🎉 Выпало ${val}! +${fmt(win)} ₽`)}else{recordGame('DICE',-bet,`Выпало ${val}`);toast(`Выпало ${val}. Поражение!`)}busy=false},1000)}
+  let bet = 100, busy = false;
+  openModal(`<div class="modal-title">🎲 DICE</div><div class="modal-sub">Кубик от 1 до 6</div>
+  <div class="dice" id="diceVal">🎲</div>
+  <div class="betbox"><span>Ставка</span><b id="diceBet">${bet} ₽</b><div class="betcontrols"><button id="diceMinus">−100</button><button id="dicePlus">+100</button></div></div>
+  <button class="btn primary" style="width:100%" id="rollDice">🎲 Бросить кубик</button>`);
+
+  $('#diceMinus').onclick = () => { bet = Math.max(100, bet - 100); $('#diceBet').textContent = fmt(bet) + ' ₽'; };
+  $('#dicePlus').onclick = () => { bet = Math.min(CONFIG.MAX_BET, bet + 100); $('#diceBet').textContent = fmt(bet) + ' ₽'; };
+  $('#rollDice').onclick = () => {
+    if (busy || !spendBet(bet)) return;
+    busy = true; saveState();
+    const d = $('#diceVal');
+    d.classList.add('roll');
+    setTimeout(() => {
+      d.classList.remove('roll');
+      const rolled = Math.floor(Math.random() * 6) + 1;
+      const icons = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣'];
+      d.textContent = icons[rolled - 1];
+      busy = false;
+
+      if (rolled >= 4) {
+        const payout = Math.floor(bet * 1.8);
+        winPayout(payout); celebrate();
+        recordGame('DICE', payout, `Выпало ${rolled} · Победа`);
+        toast(`🎉 Выпало ${rolled}! +${fmt(payout)} ₽`);
+      } else {
+        recordGame('DICE', -bet, `Выпало ${rolled} · Поражение`);
+        toast(`❌ Выпало ${rolled}`);
+      }
+      saveState();
+    }, 1000);
+  };
 }
 
-// Назначение событий на кнопки
-document.querySelectorAll('.game').forEach(b=>b.onclick=()=>{
-  const g=b.dataset.game;
-  if(g==='mines')openMines();
-  if(g==='slots')openSlots();
-  if(g==='coin')openCoin();
-  if(g==='dice')openDice();
+document.querySelectorAll('[data-game]').forEach(b => {
+  b.onclick = () => {
+    const g = b.dataset.game;
+    if (g === 'mines') openMines();
+    if (g === 'slots') openSlots();
+    if (g === 'coin') openCoin();
+    if (g === 'dice') openDice();
+  };
 });
 
-$('#depositBtn').onclick=openDeposit;
-$('#withdrawBtn').onclick=openWithdraw;
-$('#clearHistory').onclick=()=>{state.history=[];saveState();toast('История очищена')};
-$('#resetDemo').onclick=()=>{if(confirm('Сбросить весь прогресс?')){localStorage.removeItem(STORAGE);state=loadState();render();checkAuth();toast('Прогресс сброшен')}};
+$('#clearHistory').onclick = () => { state.history = []; saveState(); toast('История очищена'); };
+$('#resetDemo').onclick = () => {
+  if (confirm('Сбросить прогресс и данные?')) {
+    localStorage.removeItem(STORAGE);
+    state = loadState();
+    checkAuth();
+    saveState();
+    toast('Прогресс сброшен');
+  }
+};
 
-// Инициализация
 checkAuth();
 render();
 </script>
