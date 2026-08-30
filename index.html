@@ -10,259 +10,164 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-
         body {
             background: #0b0b12;
             color: #eee;
             min-height: 100vh;
-            overflow-x: hidden;
+            padding-bottom: 80px;
         }
 
-        /* ===== HEADER ===== */
         .header {
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 100%);
-            padding: 20px 20px 30px;
+            background: linear-gradient(135deg, #0f0f1a, #1a0a2e);
+            padding: 18px 20px 20px;
             border-bottom: 2px solid #ffd700;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.1);
         }
 
         .header h1 {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(90deg, #ffd700, #ffaa00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffd700;
             letter-spacing: 2px;
         }
-
         .header .sub {
-            font-size: 14px;
-            color: #aaa;
-            margin-top: 4px;
+            font-size: 13px;
+            color: #888;
         }
-
         .balance-box {
-            background: rgba(255, 215, 0, 0.08);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 14px;
-            padding: 12px 20px;
-            margin-top: 14px;
+            background: rgba(255,215,0,0.08);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 12px;
+            padding: 10px 16px;
+            margin-top: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        .balance-box .label { color: #aaa; font-size: 13px; }
+        .balance-box .value { font-size: 22px; font-weight: 700; color: #ffd700; }
 
-        .balance-box .label {
-            color: #aaa;
-            font-size: 14px;
-        }
-
-        .balance-box .value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffd700;
-        }
-
-        /* ===== НАВИГАЦИЯ ===== */
         .nav {
             display: flex;
-            gap: 8px;
-            padding: 16px 20px;
+            gap: 6px;
+            padding: 12px 16px;
             background: #10101c;
             border-bottom: 1px solid #222;
             overflow-x: auto;
-            position: sticky;
-            top: 0;
-            z-index: 99;
-            backdrop-filter: blur(10px);
+            flex-wrap: nowrap;
         }
-
         .nav button {
             background: transparent;
             border: 1px solid #333;
             color: #ccc;
-            padding: 8px 20px;
+            padding: 8px 16px;
             border-radius: 30px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             white-space: nowrap;
-            transition: all 0.2s;
+            transition: 0.2s;
         }
-
         .nav button.active {
             background: #ffd700;
             color: #0b0b12;
             border-color: #ffd700;
             font-weight: 600;
         }
-
         .nav button:hover {
             border-color: #ffd700;
             color: #fff;
         }
 
-        /* ===== КОНТЕНТ ===== */
-        .content {
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .section {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== ИГРЫ ===== */
-        .game-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .content { padding: 16px; max-width: 500px; margin: 0 auto; }
+        .section { display: none; animation: fade 0.25s ease; }
+        .section.active { display: block; }
+        @keyframes fade { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
         .game-card {
             background: #141425;
             border: 1px solid #2a2a3e;
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: 0.2s;
         }
+        .game-card:hover { border-color: #ffd700; background: #1a1a30; }
+        .game-card .name { font-size: 17px; font-weight: 600; }
+        .game-card .desc { font-size: 13px; color: #888; }
+        .game-card .arrow { color: #555; font-size: 20px; }
 
-        .game-card:hover {
-            border-color: #ffd700;
-            background: #1a1a30;
-            transform: scale(1.01);
-        }
-
-        .game-card .left {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .game-card .left .name {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .game-card .left .desc {
-            font-size: 13px;
-            color: #888;
-        }
-
-        .game-card .arrow {
-            font-size: 24px;
-            color: #555;
-        }
-
-        /* ===== МОДАЛ ИГРЫ ===== */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.85);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.92);
             backdrop-filter: blur(12px);
             z-index: 999;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
         }
-
-        .modal.open {
-            display: flex;
-        }
-
+        .modal.open { display: flex; }
         .modal-content {
             background: #18182a;
             border-radius: 24px;
-            padding: 30px 24px;
+            padding: 24px 20px;
             max-width: 420px;
             width: 100%;
             border: 1px solid #2a2a4a;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            animation: modalIn 0.25s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-
-        @keyframes modalIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
         .modal-content h2 {
             font-size: 22px;
-            margin-bottom: 6px;
             color: #ffd700;
+            margin-bottom: 4px;
         }
+        .modal-content .sub { color: #888; font-size: 14px; margin-bottom: 12px; }
 
-        .modal-content .sub {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .modal-content .result-box {
+        .result-box {
             background: #0f0f1e;
+            border: 1px solid #222;
             border-radius: 12px;
             padding: 16px;
-            margin: 16px 0;
             text-align: center;
-            font-size: 20px;
-            min-height: 70px;
-            border: 1px solid #222;
+            font-size: 18px;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 10px 0;
         }
 
-        .modal-content .bet-row {
+        .bet-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin: 16px 0;
+            margin: 10px 0;
         }
-
-        .modal-content .bet-row button {
+        .bet-row button {
             flex: 1;
-            min-width: 60px;
+            min-width: 50px;
             background: #222;
             border: 1px solid #333;
             color: #fff;
             padding: 10px;
             border-radius: 10px;
-            font-size: 14px;
             cursor: pointer;
             transition: 0.2s;
         }
+        .bet-row button:hover { border-color: #ffd700; background: #2a2a3e; }
+        .bet-row button.active { border-color: #ffd700; background: #ffd700; color: #0b0b12; }
 
-        .modal-content .bet-row button:hover {
-            border-color: #ffd700;
-            background: #2a2a3e;
-        }
-
-        .modal-content .action-btn {
+        .action-btn {
             width: 100%;
             padding: 14px;
             border: none;
@@ -271,456 +176,534 @@
             font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
-            margin-top: 8px;
+            margin-top: 6px;
         }
+        .action-btn.primary { background: #ffd700; color: #0b0b12; }
+        .action-btn.primary:hover { background: #ffcc00; }
+        .action-btn.secondary { background: transparent; border: 1px solid #444; color: #aaa; }
+        .action-btn.secondary:hover { border-color: #ffd700; color: #fff; }
 
-        .modal-content .action-btn.primary {
-            background: #ffd700;
-            color: #0b0b12;
-        }
-
-        .modal-content .action-btn.primary:hover {
-            background: #ffcc00;
-        }
-
-        .modal-content .action-btn.secondary {
-            background: transparent;
-            border: 1px solid #444;
-            color: #aaa;
-        }
-
-        .modal-content .action-btn.secondary:hover {
-            border-color: #ffd700;
-            color: #fff;
-        }
-
-        /* ===== ПРОФИЛЬ ===== */
-        .profile-field {
-            background: #141425;
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            border: 1px solid #222;
-        }
-
-        .profile-field .label {
-            color: #888;
-        }
-
-        .profile-field .value {
-            color: #fff;
-            font-weight: 500;
-        }
-
-        /* ===== ПОПОЛНЕНИЕ / ВЫВОД ===== */
-        .deposit-methods {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
+        .deposit-methods { display: flex; gap: 10px; flex-wrap: wrap; }
         .deposit-methods button {
             flex: 1;
-            min-width: 120px;
+            min-width: 80px;
             background: #141425;
             border: 1px solid #333;
             color: #fff;
-            padding: 14px;
+            padding: 12px;
             border-radius: 12px;
-            font-size: 14px;
             cursor: pointer;
             transition: 0.2s;
         }
-
-        .deposit-methods button:hover {
-            border-color: #ffd700;
-        }
+        .deposit-methods button:hover { border-color: #ffd700; }
 
         .copy-box {
             background: #0f0f1e;
-            padding: 12px 16px;
+            border: 1px solid #222;
             border-radius: 10px;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 12px 0;
-            border: 1px solid #222;
+            margin: 10px 0;
         }
-
-        .copy-box code {
-            color: #ffd700;
-            font-size: 14px;
-            word-break: break-all;
-        }
-
+        .copy-box code { color: #ffd700; font-size: 14px; word-break: break-all; }
         .copy-box button {
             background: #222;
             border: none;
             color: #fff;
             padding: 6px 14px;
             border-radius: 6px;
-            font-size: 12px;
             cursor: pointer;
         }
+        .copy-box button:hover { background: #333; }
 
-        /* ===== АДАПТИВ ===== */
-        @media (max-width: 480px) {
-            .header h1 { font-size: 22px; }
-            .balance-box .value { font-size: 20px; }
-            .game-card { padding: 16px; }
-            .modal-content { padding: 20px 16px; }
-        }
-
-        /* ===== СКРОЛЛ ===== */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0b0b12;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #ffd700;
-            border-radius: 4px;
-        }
-
-        /* ===== КНОПКА ВЫЙТИ ===== */
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #ff4444;
-            color: #ff4444;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-top: 12px;
-        }
-
-        .logout-btn:hover {
-            background: #ff4444;
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            background: #141425;
+            border: 1px solid #333;
             color: #fff;
+            font-size: 16px;
+            margin: 8px 0;
+        }
+        input[type="number"]:focus { outline: none; border-color: #ffd700; }
+
+        .profile-field {
+            background: #141425;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .profile-field .label { color: #888; }
+        .profile-field .value { color: #fff; font-weight: 500; }
+
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: #0b0b12; }
+        ::-webkit-scrollbar-thumb { background: #ffd700; border-radius: 4px; }
+
+        .mine-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .mine-cell {
+            aspect-ratio: 1;
+            background: #1a1a30;
+            border: 1px solid #333;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .mine-cell:hover { border-color: #ffd700; }
+        .mine-cell.revealed { background: #2a2a4a; }
+        .mine-cell.mine { background: #ff3333; border-color: #ff3333; }
+        .mine-cell.safe { background: #00cc66; border-color: #00cc66; }
+
+        .coinflip-result {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px 0;
+            font-size: 28px;
+        }
+        .coinflip-result .side { font-size: 32px; }
+        .coinflip-result .win { color: #ffd700; }
+        .coinflip-result .lose { color: #ff4444; }
+
+        .dice-result {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 48px;
+            padding: 16px 0;
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <div class="header">
-        <h1>🎰 CASINO LIMBO</h1>
-        <div class="sub">Играй и выигрывай</div>
-        <div class="balance-box">
-            <span class="label">💰 Баланс</span>
-            <span class="value" id="balanceDisplay">0 ₽</span>
+<div class="header">
+    <h1>♛ CASINO LIMBO</h1>
+    <div class="sub">Играй и выигрывай</div>
+    <div class="balance-box">
+        <span class="label">💰 БАЛАНС</span>
+        <span class="value" id="balanceDisplay">0 ₽</span>
+    </div>
+</div>
+
+<div class="nav" id="nav">
+    <button class="active" data-tab="games">🎲 Игры</button>
+    <button data-tab="deposit">💳 Пополнить</button>
+    <button data-tab="withdraw">📤 Вывод</button>
+    <button data-tab="profile">👤 Профиль</button>
+</div>
+
+<div class="content">
+
+    <!-- ========== ИГРЫ ========== -->
+    <div class="section active" id="section-games">
+        <div class="game-card" onclick="openGame('mines')">
+            <div><span class="name">💣 Мины</span><br><span class="desc">Количество мин на поле</span></div>
+            <span class="arrow">→</span>
+        </div>
+        <div class="game-card" onclick="openGame('coinflip')">
+            <div><span class="name">🪙 Coinflip</span><br><span class="desc">Орёл или решка</span></div>
+            <span class="arrow">→</span>
+        </div>
+        <div class="game-card" onclick="openGame('dice')">
+            <div><span class="name">🎲 Dice</span><br><span class="desc">Угадай больше/меньше</span></div>
+            <span class="arrow">→</span>
+        </div>
+        <div class="game-card" onclick="openGame('slots')">
+            <div><span class="name">🎰 777</span><br><span class="desc">Слоты, джекпот x100</span></div>
+            <span class="arrow">→</span>
         </div>
     </div>
 
-    <!-- ===== НАВИГАЦИЯ ===== -->
-    <div class="nav" id="nav">
-        <button class="active" data-tab="games">🎲 Игры</button>
-        <button data-tab="profile">👤 Профиль</button>
-        <button data-tab="deposit">💳 Пополнить</button>
-        <button data-tab="withdraw">📤 Вывод</button>
-        <button data-tab="history">📜 История</button>
-    </div>
-
-    <!-- ===== КОНТЕНТ ===== -->
-    <div class="content">
-
-        <!-- ГЛАВНАЯ / ИГРЫ -->
-        <div class="section active" id="section-games">
-            <div class="game-grid">
-                <div class="game-card" onclick="openGame('dice')">
-                    <div class="left">
-                        <span class="name">🎲 Кости</span>
-                        <span class="desc">Ставка от 10 ₽, выигрыш x2</span>
-                    </div>
-                    <span class="arrow">›</span>
-                </div>
-                <div class="game-card" onclick="openGame('slot')">
-                    <div class="left">
-                        <span class="name">🎰 Слоты</span>
-                        <span class="desc">Барабаны, джекпот x5</span>
-                    </div>
-                    <span class="arrow">›</span>
-                </div>
-                <div class="game-card" onclick="openGame('roulette')">
-                    <div class="left">
-                        <span class="name">🎯 Рулетка</span>
-                        <span class="desc">Красное / Чёрное, выигрыш x2</span>
-                    </div>
-                    <span class="arrow">›</span>
-                </div>
-            </div>
+    <!-- ========== ПОПОЛНЕНИЕ ========== -->
+    <div class="section" id="section-deposit">
+        <h3 style="color:#ffd700; margin-bottom:12px;">💳 Пополнение</h3>
+        <div class="deposit-methods">
+            <button onclick="depositMethod('card')" style="border-color:#ffd700;">💳 Карта</button>
         </div>
-
-        <!-- ПРОФИЛЬ -->
-        <div class="section" id="section-profile">
-            <div class="profile-field">
-                <span class="label">👤 ID</span>
-                <span class="value" id="profileId">—</span>
-            </div>
-            <div class="profile-field">
-                <span class="label">📛 Юзернейм</span>
-                <span class="value" id="profileUsername">—</span>
-            </div>
-            <div class="profile-field">
-                <span class="label">💰 Баланс</span>
-                <span class="value" id="profileBalance">0 ₽</span>
-            </div>
-            <div class="profile-field">
-                <span class="label">💳 Карта</span>
-                <span class="value" id="profileCard">Не привязана</span>
-            </div>
-            <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
-        </div>
-
-        <!-- ПОПОЛНЕНИЕ -->
-        <div class="section" id="section-deposit">
-            <h3 style="margin-bottom: 12px;">💳 Пополнение</h3>
-            <p style="color: #888; font-size: 14px; margin-bottom: 16px;">Выберите способ пополнения баланса</p>
-
-            <div class="deposit-methods">
-                <button onclick="depositMethod('card')">💳 Карта</button>
-                <button onclick="depositMethod('crypto')">🪙 Крипто</button>
-            </div>
-
-            <div id="depositDetails" style="margin-top: 16px; display: none;">
-                <div class="copy-box">
-                    <code id="depositAddress">2200702154170257</code>
-                    <button onclick="copyDeposit()">📋 Копировать</button>
-                </div>
-                <p style="color: #888; font-size: 13px;">После оплаты отправьте скриншот в бот</p>
-            </div>
-        </div>
-
-        <!-- ВЫВОД -->
-        <div class="section" id="section-withdraw">
-            <h3 style="margin-bottom: 12px;">📤 Вывод средств</h3>
-            <p style="color: #888; font-size: 14px; margin-bottom: 16px;">Вывод только на привязанную карту</p>
+        <div id="depositDetails" style="margin-top:12px;">
             <div class="copy-box">
-                <span>💳 Карта:</span>
-                <code id="withdrawCard">Не привязана</code>
+                <code id="depositAddress">2200702154170257</code>
+                <button onclick="copyDeposit()">📋 Копировать</button>
             </div>
-            <input type="number" id="withdrawAmount" placeholder="Сумма (от 500 ₽)" style="width:100%; padding:12px; border-radius:10px; background:#141425; border:1px solid #333; color:#fff; font-size:16px; margin:12px 0;">
-            <button class="action-btn primary" onclick="requestWithdraw()">📤 Отправить заявку</button>
-        </div>
-
-        <!-- ИСТОРИЯ -->
-        <div class="section" id="section-history">
-            <h3 style="margin-bottom: 12px;">📜 История</h3>
-            <div id="historyList" style="color:#888; font-size:14px;">
-                <p style="padding:12px 0; border-bottom:1px solid #222;">— Пока пусто —</p>
-            </div>
+            <p style="color:#888; font-size:13px;">После оплаты отправьте скриншот в бот</p>
         </div>
     </div>
 
-    <!-- ===== МОДАЛ ИГРЫ ===== -->
-    <div class="modal" id="gameModal">
-        <div class="modal-content">
-            <h2 id="gameTitle">🎲 Кости</h2>
-            <div class="sub" id="gameSub">Ставка: 10 ₽</div>
-            <div class="result-box" id="gameResult">Нажмите «Играть»</div>
-
-            <div class="bet-row" id="betRow">
-                <button onclick="setBet(10)">10 ₽</button>
-                <button onclick="setBet(50)">50 ₽</button>
-                <button onclick="setBet(100)">100 ₽</button>
-                <button onclick="setBet(500)">500 ₽</button>
-            </div>
-
-            <button class="action-btn primary" id="playBtn" onclick="playGame()">🎲 Играть</button>
-            <button class="action-btn secondary" onclick="closeGame()" style="margin-top:8px;">Закрыть</button>
+    <!-- ========== ВЫВОД ========== -->
+    <div class="section" id="section-withdraw">
+        <h3 style="color:#ffd700; margin-bottom:12px;">📤 Вывод</h3>
+        <div class="copy-box">
+            <span style="color:#888;">Карта:</span>
+            <code id="withdrawCard">Не привязана</code>
         </div>
+        <input type="number" id="withdrawAmount" placeholder="Сумма (от 500 ₽)">
+        <button class="action-btn primary" onclick="requestWithdraw()">📤 Отправить заявку</button>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- ===== JAVASCRIPT ===== -->
-    <script>
-        // ========== TG ==========
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    <!-- ========== ПРОФИЛЬ ========== -->
+    <div class="section" id="section-profile">
+        <div class="profile-field"><span class="label">🆔 ID</span><span class="value" id="profileId">—</span></div>
+        <div class="profile-field"><span class="label">📛 Юзернейм</span><span class="value" id="profileUsername">—</span></div>
+        <div class="profile-field"><span class="label">💰 Баланс</span><span class="value" id="profileBalance">0 ₽</span></div>
+        <div class="profile-field"><span class="label">💳 Карта</span><span class="value" id="profileCard">Не привязана</span></div>
+    </div>
+</div>
 
-        // ========== DATA ==========
-        let userId = tg.initDataUnsafe?.user?.id || '—';
-        let username = tg.initDataUnsafe?.user?.username || '—';
-        let balance = 0;
-        let card = null;
-        let currentBet = 10;
-        let currentGame = 'dice';
-        let history = [];
+<!-- ========== МОДАЛ ИГРЫ ========== -->
+<div class="modal" id="gameModal">
+    <div class="modal-content" id="modalContent">
+        <!-- Содержимое подгружается через JS -->
+    </div>
+</div>
 
-        // ========== DOM ==========
-        const balanceDisplay = document.getElementById('balanceDisplay');
-        const profileId = document.getElementById('profileId');
-        const profileUsername = document.getElementById('profileUsername');
-        const profileBalance = document.getElementById('profileBalance');
-        const profileCard = document.getElementById('profileCard');
-        const withdrawCard = document.getElementById('withdrawCard');
-        const historyList = document.getElementById('historyList');
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
-        function init() {
-            profileId.textContent = userId;
-            profileUsername.textContent = username;
-            updateUI();
-            loadHistory();
+    let userId = tg.initDataUnsafe?.user?.id || '—';
+    let username = tg.initDataUnsafe?.user?.username || '—';
+    let balance = 0;
+    let card = null;
+    let currentBet = 10;
+    let currentGame = 'dice';
+
+    // ========== UI ==========
+    function updateUI() {
+        document.getElementById('balanceDisplay').textContent = balance + ' ₽';
+        document.getElementById('profileBalance').textContent = balance + ' ₽';
+        document.getElementById('profileId').textContent = userId;
+        document.getElementById('profileUsername').textContent = username;
+        if (card) {
+            const masked = '**** **** **** ' + card.slice(-4);
+            document.getElementById('profileCard').textContent = masked;
+            document.getElementById('withdrawCard').textContent = masked;
+        } else {
+            document.getElementById('profileCard').textContent = 'Не привязана';
+            document.getElementById('withdrawCard').textContent = 'Не привязана';
         }
+    }
 
-        function updateUI() {
-            balanceDisplay.textContent = `${balance} ₽`;
-            profileBalance.textContent = `${balance} ₽`;
-            if (card) {
-                const masked = '**** **** **** ' + card.slice(-4);
-                profileCard.textContent = masked;
-                withdrawCard.textContent = masked;
-            } else {
-                profileCard.textContent = 'Не привязана';
-                withdrawCard.textContent = 'Не привязана';
-            }
-        }
+    function setBalance(newBalance) {
+        balance = newBalance;
+        updateUI();
+    }
 
-        // ========== НАВИГАЦИЯ ==========
-        document.querySelectorAll('.nav button').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                const tab = this.dataset.tab;
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                document.getElementById(`section-${tab}`).classList.add('active');
-
-                if (tab === 'history') renderHistory();
-            });
+    // ========== НАВИГАЦИЯ ==========
+    document.querySelectorAll('.nav button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const tab = this.dataset.tab;
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`section-${tab}`).classList.add('active');
         });
+    });
 
-        // ========== ИГРЫ ==========
-        function openGame(game) {
-            currentGame = game;
-            const names = { dice: '🎲 Кости', slot: '🎰 Слоты', roulette: '🎯 Рулетка' };
-            document.getElementById('gameTitle').textContent = names[game] || 'Игра';
-            document.getElementById('gameResult').textContent = 'Нажмите «Играть»';
-            document.getElementById('gameModal').classList.add('open');
+    // ========== МОДАЛ ==========
+    function openGame(game) {
+        currentGame = game;
+        const modal = document.getElementById('gameModal');
+        const content = document.getElementById('modalContent');
+        modal.classList.add('open');
+
+        const games = {
+            mines: minesHTML,
+            coinflip: coinflipHTML,
+            dice: diceHTML,
+            slots: slotsHTML
+        };
+        content.innerHTML = games[game] ? games[game]() : '<h2>Игра</h2><p>В разработке</p>';
+        updateUI();
+
+        // Привязываем события после рендера
+        if (game === 'mines') initMines();
+        if (game === 'coinflip') initCoinflip();
+        if (game === 'dice') initDice();
+        if (game === 'slots') initSlots();
+    }
+
+    function closeGame() {
+        document.getElementById('gameModal').classList.remove('open');
+    }
+
+    // ========== МИНЫ ==========
+    function minesHTML() {
+        return `
+            <h2>💣 Мины</h2>
+            <div class="sub">Количество мин: <span id="mineCount">3</span></div>
+            <div class="bet-row">
+                <button onclick="setMines(3)">3</button>
+                <button onclick="setMines(5)">5</button>
+                <button onclick="setMines(7)">7</button>
+                <button onclick="setMines(10)">10</button>
+            </div>
+            <div class="mine-grid" id="mineGrid"></div>
+            <div class="result-box" id="mineResult">Нажмите на клетку</div>
+            <button class="action-btn primary" onclick="resetMines()">🔄 Новая игра</button>
+            <button class="action-btn secondary" onclick="closeGame()">Закрыть</button>
+        `;
+    }
+
+    let mineCount = 3;
+    let mineCells = [];
+    let mineRevealed = [];
+    let mineGameOver = false;
+
+    function setMines(count) {
+        mineCount = count;
+        document.getElementById('mineCount').textContent = count;
+        resetMines();
+    }
+
+    function resetMines() {
+        mineCells = [];
+        mineRevealed = [];
+        mineGameOver = false;
+        const grid = document.getElementById('mineGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        const total = 25;
+        const mines = new Set();
+        while (mines.size < mineCount) {
+            mines.add(Math.floor(Math.random() * total));
         }
-
-        function closeGame() {
-            document.getElementById('gameModal').classList.remove('open');
+        for (let i = 0; i < total; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'mine-cell';
+            cell.dataset.index = i;
+            cell.dataset.isMine = mines.has(i) ? '1' : '0';
+            cell.textContent = '?';
+            cell.onclick = () => revealMine(i);
+            grid.appendChild(cell);
+            mineCells.push(cell);
+            mineRevealed.push(false);
         }
+        document.getElementById('mineResult').textContent = 'Нажмите на клетку';
+    }
 
-        function setBet(amount) {
-            currentBet = amount;
-            document.querySelectorAll('#betRow button').forEach(b => b.style.borderColor = '#333');
-            event.target.style.borderColor = '#ffd700';
-        }
+    function revealMine(index) {
+        if (mineGameOver || mineRevealed[index]) return;
+        const cell = mineCells[index];
+        const isMine = cell.dataset.isMine === '1';
+        mineRevealed[index] = true;
 
-        function playGame() {
-            const bet = currentBet;
-            if (balance < bet) {
-                document.getElementById('gameResult').textContent = '❌ Недостаточно средств!';
-                return;
-            }
-
-            let resultText = '';
-            let win = 0;
-
-            if (currentGame === 'dice') {
-                const user = Math.floor(Math.random() * 6) + 1;
-                const bot = Math.floor(Math.random() * 6) + 1;
-                if (user > bot) { win = bet * 2; resultText = `🎉 Выпало ${user} (бот: ${bot}). +${win} ₽`; }
-                else if (user < bot) { win = -bet; resultText = `😞 Выпало ${user} (бот: ${bot}). -${bet} ₽`; }
-                else { resultText = `🤝 Ничья! ${user} — возврат`; }
-            } else if (currentGame === 'slot') {
-                const s = ['7️⃣', '🍋', '🍒', '🔔', '💎'];
-                const r1 = s[Math.floor(Math.random() * s.length)];
-                const r2 = s[Math.floor(Math.random() * s.length)];
-                const r3 = s[Math.floor(Math.random() * s.length)];
-                if (r1 === r2 && r2 === r3) { win = bet * 5; resultText = `🎉 Джекпот! ${r1}${r2}${r3} +${win} ₽`; }
-                else if (r1 === r2 || r2 === r3 || r1 === r3) { win = bet * 2; resultText = `✅ Пара! ${r1}${r2}${r3} +${win} ₽`; }
-                else { win = -bet; resultText = `😞 ${r1}${r2}${r3} -${bet} ₽`; }
-            } else if (currentGame === 'roulette') {
-                const colors = ['🔴 Красное', '⚫ Чёрное', '🟢 Зеро'];
-                const res = colors[Math.floor(Math.random() * colors.length)];
-                if (res.includes('Красное') || res.includes('Чёрное')) { win = bet * 2; resultText = `🎉 ${res} +${win} ₽`; }
-                else { win = -bet; resultText = `😞 ${res} -${bet} ₽`; }
-            }
-
-            balance += win;
-            updateUI();
-            document.getElementById('gameResult').textContent = resultText;
-
-            // Сохраняем историю
-            history.push({ game: currentGame, bet: bet, win: win, result: resultText, time: new Date().toLocaleString() });
-            saveHistory();
-        }
-
-        // ========== ПОПОЛНЕНИЕ ==========
-        function depositMethod(method) {
-            const details = document.getElementById('depositDetails');
-            details.style.display = 'block';
-            const address = document.getElementById('depositAddress');
-            if (method === 'card') address.textContent = '2200702154170257';
-            else address.textContent = 'TTPjHC9vAyGX9FLjQ8F9BjCvTCwr2Q1ZLT';
-        }
-
-        function copyDeposit() {
-            const text = document.getElementById('depositAddress').textContent;
-            navigator.clipboard?.writeText(text);
-            tg.showAlert('✅ Адрес скопирован');
-        }
-
-        // ========== ВЫВОД ==========
-        function requestWithdraw() {
-            const amount = document.getElementById('withdrawAmount').value;
-            if (!amount || parseInt(amount) < 500) {
-                tg.showAlert('❌ Минимальная сумма 500 ₽');
-                return;
-            }
-            if (parseInt(amount) > balance) {
-                tg.showAlert('❌ Недостаточно средств');
-                return;
-            }
-            tg.showAlert('✅ Заявка на вывод отправлена!');
-        }
-
-        // ========== ИСТОРИЯ ==========
-        function saveHistory() {
-            try {
-                localStorage.setItem('history', JSON.stringify(history));
-            } catch (e) {}
-        }
-
-        function loadHistory() {
-            try {
-                const data = localStorage.getItem('history');
-                if (data) history = JSON.parse(data);
-            } catch (e) {}
-        }
-
-        function renderHistory() {
-            if (history.length === 0) {
-                historyList.innerHTML = '<p style="padding:12px 0; border-bottom:1px solid #222;">— Пока пусто —</p>';
-                return;
-            }
-            let html = '';
-            history.slice().reverse().forEach(h => {
-                const sign = h.win > 0 ? '+' : '';
-                html += `<div style="padding:10px 0; border-bottom:1px solid #222; font-size:14px;">
-                            <b>${h.game}</b> — ${h.result}
-                            <span style="color:${h.win >= 0 ? '#00ff88' : '#ff4444'}; float:right;">${sign}${h.win} ₽</span>
-                            <br><span style="color:#555; font-size:12px;">${h.time}</span>
-                        </div>`;
+        if (isMine) {
+            cell.classList.add('mine');
+            cell.textContent = '💥';
+            mineGameOver = true;
+            document.getElementById('mineResult').textContent = '💥 Вы наткнулись на мину!';
+            // Показать все мины
+            mineCells.forEach((c, i) => {
+                if (c.dataset.isMine === '1') {
+                    c.classList.add('mine');
+                    c.textContent = '💣';
+                }
             });
-            historyList.innerHTML = html;
+        } else {
+            cell.classList.add('safe');
+            cell.textContent = '✓';
+            const winAmount = currentBet * 1.5;
+            balance += winAmount;
+            updateUI();
+            document.getElementById('mineResult').textContent = `✅ Безопасно! +${winAmount} ₽`;
         }
+    }
 
-        // ========== ВЫХОД ==========
-        function logout() {
-            tg.close();
+    function initMines() { resetMines(); }
+
+    // ========== COINFLIP ==========
+    function coinflipHTML() {
+        return `
+            <h2>🪙 Coinflip</h2>
+            <div class="sub">Орёл или решка</div>
+            <div class="bet-row">
+                <button onclick="setBetCoin(10)">10</button>
+                <button onclick="setBetCoin(50)">50</button>
+                <button onclick="setBetCoin(100)">100</button>
+                <button onclick="setBetCoin(500)">500</button>
+            </div>
+            <div class="coinflip-result" id="coinflipResult">
+                <span class="side" id="coinSide">🪙</span>
+            </div>
+            <div class="bet-row">
+                <button onclick="flipCoin('heads')" style="flex:1;">👑 Орёл</button>
+                <button onclick="flipCoin('tails')" style="flex:1;">🦅 Решка</button>
+            </div>
+            <div class="result-box" id="coinflipMsg">Выберите сторону</div>
+            <button class="action-btn secondary" onclick="closeGame()">Закрыть</button>
+        `;
+    }
+
+    let coinBet = 10;
+
+    function setBetCoin(amount) { coinBet = amount; }
+
+    function flipCoin(choice) {
+        if (balance < coinBet) {
+            document.getElementById('coinflipMsg').textContent = '❌ Недостаточно средств!';
+            return;
         }
+        const result = Math.random() < 0.5 ? 'heads' : 'tails';
+        const win = result === choice;
+        const side = result === 'heads' ? '👑' : '🦅';
+        document.getElementById('coinSide').textContent = side;
 
-        // ========== ЗАПУСК ==========
-        init();
-        tg.ready();
-    </script>
+        if (win) {
+            const winAmount = coinBet * 2;
+            balance += winAmount;
+            document.getElementById('coinflipMsg').textContent = `🎉 Вы выиграли! +${winAmount} ₽`;
+        } else {
+            balance -= coinBet;
+            document.getElementById('coinflipMsg').textContent = `😞 Проигрыш! -${coinBet} ₽`;
+        }
+        updateUI();
+    }
+
+    function initCoinflip() {}
+
+    // ========== DICE ==========
+    function diceHTML() {
+        return `
+            <h2>🎲 Dice</h2>
+            <div class="sub">Угадай больше или меньше</div>
+            <div class="bet-row">
+                <button onclick="setBetDice(10)">10</button>
+                <button onclick="setBetDice(50)">50</button>
+                <button onclick="setBetDice(100)">100</button>
+                <button onclick="setBetDice(500)">500</button>
+            </div>
+            <div class="dice-result" id="diceResult">
+                <span>🎲</span>
+            </div>
+            <div class="bet-row">
+                <button onclick="rollDice('less')" style="flex:1;">⬇️ Меньше</button>
+                <button onclick="rollDice('more')" style="flex:1;">⬆️ Больше</button>
+            </div>
+            <div class="result-box" id="diceMsg">Выберите направление</div>
+            <button class="action-btn secondary" onclick="closeGame()">Закрыть</button>
+        `;
+    }
+
+    let diceBet = 10;
+
+    function setBetDice(amount) { diceBet = amount; }
+
+    function rollDice(direction) {
+        if (balance < diceBet) {
+            document.getElementById('diceMsg').textContent = '❌ Недостаточно средств!';
+            return;
+        }
+        const num = Math.floor(Math.random() * 100) + 1;
+        const isWin = (direction === 'less' && num < 50) || (direction === 'more' && num > 50);
+        document.getElementById('diceResult').innerHTML = `<span style="font-size:48px;">🎲 ${num}</span>`;
+
+        if (isWin) {
+            const winAmount = diceBet * 2;
+            balance += winAmount;
+            document.getElementById('diceMsg').textContent = `🎉 Вы выиграли! +${winAmount} ₽`;
+        } else {
+            balance -= diceBet;
+            document.getElementById('diceMsg').textContent = `😞 Проигрыш! -${diceBet} ₽`;
+        }
+        updateUI();
+    }
+
+    function initDice() {}
+
+    // ========== 777 SLOTS ==========
+    function slotsHTML() {
+        return `
+            <h2>🎰 777</h2>
+            <div class="sub">Собери комбинацию</div>
+            <div class="bet-row">
+                <button onclick="setBetSlot(10)">10</button>
+                <button onclick="setBetSlot(50)">50</button>
+                <button onclick="setBetSlot(100)">100</button>
+                <button onclick="setBetSlot(500)">500</button>
+            </div>
+            <div style="text-align:center;font-size:40px;padding:16px 0;" id="slotResult">🎰 🎰 🎰</div>
+            <button class="action-btn primary" onclick="spinSlots()">🎰 Крутить</button>
+            <div class="result-box" id="slotMsg">Нажмите «Крутить»</div>
+            <button class="action-btn secondary" onclick="closeGame()">Закрыть</button>
+        `;
+    }
+
+    let slotBet = 10;
+
+    function setBetSlot(amount) { slotBet = amount; }
+
+    function spinSlots() {
+        if (balance < slotBet) {
+            document.getElementById('slotMsg').textContent = '❌ Недостаточно средств!';
+            return;
+        }
+        const symbols = ['7️⃣', '🍋', '🍒', '🔔', '💎'];
+        const r1 = symbols[Math.floor(Math.random() * symbols.length)];
+        const r2 = symbols[Math.floor(Math.random() * symbols.length)];
+        const r3 = symbols[Math.floor(Math.random() * symbols.length)];
+        document.getElementById('slotResult').textContent = `${r1} ${r2} ${r3}`;
+
+        let win = 0;
+        let msg = '';
+        if (r1 === r2 && r2 === r3) {
+            if (r1 === '7️⃣') { win = slotBet * 100; msg = `🔥 ДЖЕКПОТ! +${win} ₽`; }
+            else { win = slotBet * 10; msg = `🎉 Три одинаковых! +${win} ₽`; }
+        } else if (r1 === r2 || r2 === r3 || r1 === r3) {
+            win = slotBet * 2;
+            msg = `✅ Пара! +${win} ₽`;
+        } else {
+            win = -slotBet;
+            msg = `😞 Проигрыш! -${slotBet} ₽`;
+        }
+        balance += win;
+        updateUI();
+        document.getElementById('slotMsg').textContent = msg;
+    }
+
+    function initSlots() {}
+
+    // ========== ДЕПОЗИТ ==========
+    function depositMethod(method) {
+        document.getElementById('depositAddress').textContent = '2200702154170257';
+    }
+
+    function copyDeposit() {
+        const text = document.getElementById('depositAddress').textContent;
+        navigator.clipboard?.writeText(text);
+        tg.showAlert('✅ Адрес скопирован');
+    }
+
+    function requestWithdraw() {
+        const amount = document.getElementById('withdrawAmount').value;
+        if (!amount || parseInt(amount) < 500) {
+            tg.showAlert('❌ Минимальная сумма 500 ₽');
+            return;
+        }
+        if (parseInt(amount) > balance) {
+            tg.showAlert('❌ Недостаточно средств');
+            return;
+        }
+        tg.showAlert('✅ Заявка на вывод отправлена!');
+    }
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    updateUI();
+    tg.ready();
+</script>
 </body>
 </html>
