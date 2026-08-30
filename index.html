@@ -1,909 +1,1743 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a0612">
-<title>LIMBO — Online Casino</title>
+<meta name="theme-color" content="#080510">
+<title>CASINO LIMBO — Telegram WebApp</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root{
+  --bg:#080510;
+  --card:#110b1c;
+  --card2:#171022;
+  --line:#2c203d;
+  --pink:#ff3f9f;
+  --purple:#8067ff;
+  --cyan:#4ee7ff;
+  --gold:#ffd36e;
+  --green:#5df0a2;
+  --red:#ff5d73;
+  --text:#fff8fc;
+  --muted:#958a9d;
+  --shadow:0 18px 60px rgba(0,0,0,.35);
 }
 
-:root {
-    --bg: #0a0612;
-    --card: #110d1a;
-    --border: #2d2340;
-    --pink: #ff3f9f;
-    --purple: #7b61ff;
-    --gold: #ffc86b;
-    --green: #63f3a4;
-    --red: #ff526d;
-    --text: #fff8fc;
-    --muted: #918793;
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent
 }
 
-body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding-bottom: 30px;
+html{
+  background:var(--bg)
 }
 
-.app {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 0 15px;
+body{
+  font-family:Inter,system-ui,sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  background:
+    radial-gradient(
+      circle at 20% -10%,
+      rgba(128,103,255,.18),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 100% 10%,
+      rgba(255,63,159,.13),
+      transparent 30%
+    ),
+    var(--bg)
+}
+
+button,input{
+  font:inherit
+}
+
+button{
+  cursor:pointer;
+  color:inherit
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none!important
+}
+
+.app{
+  width:min(520px,100%);
+  margin:auto;
+  padding:0 14px 32px
 }
 
 /* HEADER */
-.header {
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 10;
+.header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  padding:12px 0 10px;
+  background:rgba(8,5,16,.84);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.05)
 }
 
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.header-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between
 }
 
-.logo {
-    font-size: 22px;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--purple), var(--pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.logo{
+  font-size:23px;
+  font-weight:900;
+  letter-spacing:-1px;
+  background:
+    linear-gradient(
+      120deg,
+      var(--cyan),
+      var(--purple),
+      var(--pink)
+    );
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent
 }
 
-.online-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 9px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.online{
+  font-size:9px;
+  letter-spacing:1px;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:6px
 }
 
-.dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 1.5s infinite;
+.online i{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 14px var(--green);
+  animation:pulse 1.4s infinite
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+.balance{
+  margin-top:11px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:19px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(23,16,34,.96),
+      rgba(12,8,20,.96)
+    );
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  position:relative
 }
 
-/* BALANCE */
-.balance-box {
-    margin-top: 12px;
-    padding: 16px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
+.balance:after{
+  content:"";
+  position:absolute;
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  right:-50px;
+  top:-60px;
+  background:rgba(128,103,255,.12);
+  filter:blur(8px)
 }
 
-.balance-box small {
-    color: var(--muted);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.label{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--muted)
 }
 
-.balance-box .amount {
-    font-size: 32px;
-    font-weight: 900;
-    margin-top: 4px;
+.amount{
+  font-size:32px;
+  font-weight:900;
+  margin-top:3px;
+  letter-spacing:-1px
 }
 
-.balance-box .amount span {
-    background: linear-gradient(135deg, var(--purple), var(--pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.amount span{
+  background:
+    linear-gradient(
+      120deg,
+      var(--purple),
+      var(--pink)
+    );
+  -webkit-background-clip:text;
+  color:transparent
 }
 
-.btn-group {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-}
-
-.btn-group button {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 11px;
-    font-weight: 700;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-deposit {
-    background: linear-gradient(135deg, var(--purple), var(--pink));
-    color: white;
-}
-
-.btn-deposit:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 30px rgba(123, 97, 255, 0.3);
-}
-
-.btn-withdraw {
-    background: #1a142a;
-    color: var(--text);
-    border: 1px solid var(--border);
-}
-
-.btn-withdraw:hover {
-    background: #2d1f3a;
-}
-
-/* NAV */
-.nav {
-    display: flex;
-    gap: 6px;
-    padding: 12px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    position: sticky;
-    top: 100px;
-    background: var(--bg);
-    z-index: 9;
-}
-
-.nav::-webkit-scrollbar { display: none; }
-
-.nav button {
-    padding: 8px 16px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--card);
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-}
-
-.nav button.active {
-    background: linear-gradient(135deg, var(--purple), var(--pink));
-    color: white;
-    border-color: transparent;
-}
-
-/* GAMES GRID */
-.games-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin: 16px 0;
-}
-
-.game-card {
-    padding: 18px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: left;
-}
-
-.game-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--purple);
-}
-
-.game-card .icon { font-size: 30px; }
-.game-card b { display: block; margin-top: 10px; font-size: 14px; }
-.game-card small { color: var(--muted); font-size: 10px; margin-top: 4px; display: block; line-height: 1.4; }
-
-/* STATS */
-.stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.stat-item {
-    padding: 12px;
-    background: #0b0818;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-}
-
-.stat-item small { color: var(--muted); font-size: 9px; display: block; }
-.stat-item b { font-size: 16px; display: block; margin-top: 4px; }
-
-/* MODAL */
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(10px);
-    z-index: 100;
-    align-items: flex-end;
-    justify-content: center;
-    padding: 10px;
-}
-
-.modal.open { display: flex; }
-
-.sheet {
-    max-width: 500px;
-    width: 100%;
-    max-height: 92vh;
-    overflow-y: auto;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px 20px 12px 12px;
-    padding: 20px;
-    animation: slideUp 0.25s ease;
-}
-
-@keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.sheet .handle {
-    width: 40px;
-    height: 4px;
-    background: #2d2340;
-    border-radius: 99px;
-    margin: 0 auto 12px;
-}
-
-.sheet .close {
-    float: right;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #1a142a;
-    border: none;
-    color: var(--muted);
-    font-size: 18px;
-    cursor: pointer;
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px
 }
 
 /* BUTTONS */
-.btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 8px;
+.btn{
+  border:0;
+  border-radius:13px;
+  padding:13px 14px;
+  font-weight:800;
+  transition:.2s;
+  position:relative;
+  overflow:hidden
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--purple), var(--pink));
-    color: white;
+.btn:active{
+  transform:scale(.97)
 }
 
-.btn-primary:hover { transform: scale(1.01); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-.btn-secondary {
-    background: #1a142a;
-    color: var(--text);
-    border: 1px solid var(--border);
+.primary{
+  background:
+    linear-gradient(
+      120deg,
+      var(--purple),
+      var(--pink)
+    );
+  box-shadow:0 8px 25px rgba(128,103,255,.2)
 }
 
-.btn-secondary:hover { background: #2d1f3a; }
-
-/* BET BAR */
-.bet-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    margin: 8px 0 12px;
+.secondary{
+  background:#1a1325;
+  border:1px solid var(--line)
 }
 
-.bet-bar button {
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: #1a142a;
-    color: var(--muted);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+.glow:before{
+  content:"";
+  position:absolute;
+  inset:-100%;
+  background:
+    linear-gradient(
+      100deg,
+      transparent 42%,
+      rgba(255,255,255,.22),
+      transparent 58%
+    );
+  transform:translateX(-40%);
+  animation:shine 3.5s infinite
 }
 
-.bet-bar button.active {
-    background: var(--pink);
-    color: white;
-    border-color: var(--pink);
+/* NAV */
+.nav{
+  display:flex;
+  gap:7px;
+  padding:11px 0;
+  position:sticky;
+  top:91px;
+  z-index:19;
+  background:rgba(8,5,16,.78);
+  backdrop-filter:blur(14px)
 }
 
-/* MINES GRID */
-.mine-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-    margin: 12px 0;
+.nav button{
+  flex:1;
+  border:1px solid var(--line);
+  background:#100b18;
+  color:var(--muted);
+  padding:9px 7px;
+  border-radius:11px;
+  font-size:11px;
+  font-weight:800;
+  transition:.2s
 }
 
-.mine-cell {
-    aspect-ratio: 1;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: #1a142a;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.nav button.active{
+  color:white;
+  border-color:transparent;
+  background:
+    linear-gradient(
+      120deg,
+      #5c49ca,
+      var(--pink)
+    );
+  box-shadow:0 6px 22px rgba(255,63,159,.12)
 }
 
-.mine-cell:hover { border-color: var(--purple); }
-.mine-cell.safe { background: #10251b; border-color: var(--green); color: var(--green); }
-.mine-cell.mine { background: #2b1018; border-color: var(--red); color: var(--red); animation: boom 0.3s ease; }
-
-@keyframes boom {
-    0% { transform: scale(0.8); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
+/* SECTIONS */
+.section{
+  display:none;
+  animation:fadeUp .28s ease
 }
 
-/* SLOTS */
-.slot-machine {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    padding: 16px;
-    background: #0b0818;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    margin: 10px 0;
+.section.active{
+  display:block
 }
 
-.slot-reel {
-    width: 64px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    background: #120e1e;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    transition: all 0.3s;
+.hero{
+  padding:12px 0 10px
 }
 
-.slot-reel.spinning { animation: reelSpin 0.08s steps(1) infinite; }
-
-@keyframes reelSpin {
-    0%, 100% { transform: translateY(0); }
-    25% { transform: translateY(-5px); }
-    75% { transform: translateY(5px); }
+.hero h1{
+  font-size:27px;
+  letter-spacing:-1px
 }
 
-.slot-reel.win {
-    border-color: var(--gold);
-    box-shadow: 0 0 30px rgba(255, 200, 107, 0.3);
+.gradient{
+  background:
+    linear-gradient(
+      120deg,
+      var(--cyan),
+      var(--purple),
+      var(--pink)
+    );
+  -webkit-background-clip:text;
+  color:transparent
 }
 
-.slot-reel.jackpot {
-    border-color: var(--gold);
-    animation: jackpotPulse 0.4s ease 6;
+.hero p{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:5px
 }
 
-@keyframes jackpotPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
+/* GAMES */
+.games{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:10px 0
+}
+
+.game{
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:
+    linear-gradient(
+      145deg,
+      #151020,
+      #0e0916
+    );
+  padding:17px;
+  text-align:left;
+  transition:.22s;
+  position:relative;
+  overflow:hidden
+}
+
+.game:hover{
+  transform:translateY(-3px);
+  border-color:#654dd0;
+  box-shadow:0 14px 35px rgba(0,0,0,.25)
+}
+
+.game:after{
+  content:"";
+  position:absolute;
+  inset:auto -30px -45px auto;
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:rgba(128,103,255,.08);
+  filter:blur(8px)
+}
+
+.icon{
+  font-size:31px
+}
+
+.game b{
+  display:block;
+  margin-top:10px;
+  font-size:14px
+}
+
+.game small{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.4
+}
+
+/* PANELS */
+.panel{
+  background:rgba(17,11,28,.88);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:14px
+}
+
+.panel-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px;
+  font-weight:800
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px
+}
+
+.stat{
+  background:#0c0814;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px
+}
+
+.stat small{
+  color:var(--muted);
+  font-size:9px
+}
+
+.stat b{
+  display:block;
+  margin-top:4px;
+  font-size:16px
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(14px);
+  display:none;
+  align-items:flex-end;
+  padding:9px
+}
+
+.modal.open{
+  display:flex
+}
+
+.sheet{
+  width:min(520px,100%);
+  max-height:94vh;
+  overflow:auto;
+  background:
+    linear-gradient(
+      160deg,
+      #171022,
+      #0d0815
+    );
+  border:1px solid var(--line);
+  border-radius:23px 23px 13px 13px;
+  padding:18px;
+  animation:sheet .3s cubic-bezier(.2,.8,.2,1)
+}
+
+.handle{
+  width:42px;
+  height:4px;
+  border-radius:99px;
+  background:#382b4a;
+  margin:0 auto 12px
+}
+
+.close{
+  float:right;
+  width:32px;
+  height:32px;
+  border:1px solid var(--line);
+  border-radius:50%;
+  background:#1a1325;
+  color:var(--muted);
+  font-size:19px
+}
+
+.modal-title{
+  font-size:23px;
+  font-weight:900
+}
+
+.modal-sub{
+  font-size:12px;
+  color:var(--muted);
+  margin:4px 0 13px
+}
+
+/* INPUT */
+.input{
+  width:100%;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#0b0711;
+  color:#fff;
+  outline:0;
+  margin:7px 0
+}
+
+.input:focus{
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px rgba(128,103,255,.1)
+}
+
+/* CHIPS */
+.chips{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  margin:8px 0 12px
+}
+
+.chip{
+  border:1px solid var(--line);
+  background:#1a1325;
+  border-radius:10px;
+  padding:9px 4px;
+  font-size:11px;
+  font-weight:800;
+  color:var(--muted);
+  transition:.18s
+}
+
+.chip.active{
+  background:rgba(255,63,159,.16);
+  border-color:var(--pink);
+  color:#fff
+}
+
+/* PAYMENT */
+.payment-step{
+  margin-top:10px
+}
+
+.payment-icon{
+  width:76px;
+  height:76px;
+  margin:10px auto 14px;
+  border-radius:23px;
+  display:grid;
+  place-items:center;
+  font-size:37px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(128,103,255,.18),
+      rgba(255,63,159,.13)
+    );
+  border:1px solid var(--line)
+}
+
+.waiting{
+  text-align:center;
+  padding:25px 10px
+}
+
+.spinner{
+  width:44px;
+  height:44px;
+  margin:0 auto 14px;
+  border-radius:50%;
+  border:4px solid #2c203d;
+  border-top-color:var(--pink);
+  animation:spin 1s linear infinite
+}
+
+.requisites{
+  margin-top:12px;
+  padding:15px;
+  border-radius:15px;
+  background:#0b0711;
+  border:1px solid var(--line)
+}
+
+.req-title{
+  color:var(--muted);
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:1px
+}
+
+.req-number{
+  font-size:20px;
+  font-weight:900;
+  margin-top:7px;
+  word-break:break-all
+}
+
+.copy-btn{
+  width:100%;
+  margin-top:9px
+}
+
+.upload-box{
+  margin-top:12px;
+  border:1px dashed #59486c;
+  border-radius:14px;
+  padding:16px;
+  text-align:center;
+  background:#0b0711
+}
+
+.upload-box input{
+  width:100%;
+  margin-top:10px
+}
+
+.preview{
+  max-width:100%;
+  max-height:220px;
+  border-radius:12px;
+  margin-top:10px;
+  display:none
+}
+
+/* HISTORY */
+.history{
+  margin-top:8px
+}
+
+.history-item{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+  font-size:11px
+}
+
+.history-item:last-child{
+  border-bottom:0
+}
+
+.win{
+  color:var(--green)
+}
+
+.loss{
+  color:var(--red)
+}
+
+.pending{
+  color:var(--gold)
+}
+
+.muted{
+  color:var(--muted)
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:30px 5px;
+  font-size:12px
+}
+
+/* PROFILE */
+.profile-head{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:9px
+}
+
+.avatar{
+  width:50px;
+  height:50px;
+  border-radius:15px;
+  background:
+    linear-gradient(
+      135deg,
+      #39204d,
+      #171022
+    );
+  display:grid;
+  place-items:center;
+  font-size:22px;
+  border:1px solid var(--line)
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+  font-size:12px
+}
+
+.row:last-child{
+  border:0
+}
+
+.row span{
+  color:var(--muted)
+}
+
+/* ADMIN */
+.admin-card{
+  margin-top:10px;
+  padding:14px;
+  border-radius:15px;
+  background:#0b0711;
+  border:1px solid var(--line)
+}
+
+.admin-badge{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:7px;
+  background:rgba(255,211,110,.1);
+  color:var(--gold);
+  font-size:9px;
+  font-weight:800
+}
+
+.admin-row{
+  display:flex;
+  gap:8px;
+  margin-top:10px
+}
+
+.admin-row .btn{
+  flex:1
 }
 
 /* TOAST */
-.toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translate(-50%, 20px);
-    background: #f8eef4;
-    color: #120d11;
-    padding: 10px 20px;
-    border-radius: 99px;
-    font-weight: 700;
-    font-size: 12px;
-    opacity: 0;
-    transition: all 0.25s;
-    pointer-events: none;
-    z-index: 200;
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  z-index:300;
+  transform:translate(-50%,20px) scale(.96);
+  opacity:0;
+  pointer-events:none;
+  background:#f8eef4;
+  color:#100b12;
+  padding:10px 17px;
+  border-radius:99px;
+  font-size:11px;
+  font-weight:800;
+  box-shadow:0 12px 35px rgba(0,0,0,.35);
+  transition:.25s;
+  white-space:nowrap
 }
 
-.toast.show {
-    opacity: 1;
-    transform: translate(-50%, 0);
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0) scale(1)
 }
 
-/* MISC */
-.section { display: none; }
-.section.active { display: block; }
-
-.history-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
+/* FOOTER */
+.footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:9px;
+  padding:20px 0 6px;
+  border-top:1px solid var(--line);
+  margin-top:17px
 }
 
-.history-item:last-child { border: none; }
-.history-item .win { color: var(--green); }
-.history-item .loss { color: var(--red); }
-
-.empty-state {
-    text-align: center;
-    padding: 30px 0;
-    color: var(--muted);
-    font-size: 13px;
+/* MINES */
+.mine-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+  margin:13px 0
 }
 
-.profile-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
+.mine-cell{
+  aspect-ratio:1;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:
+    linear-gradient(
+      145deg,
+      #21172e,
+      #151020
+    );
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.18s
 }
 
-.profile-row:last-child { border: none; }
-.profile-row span { color: var(--muted); }
-
-.payment-input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    background: #0b0818;
-    border: 1px solid var(--border);
-    color: white;
-    font-size: 16px;
-    margin: 8px 0;
+.mine-cell:not(:disabled):hover{
+  transform:translateY(-2px);
+  border-color:var(--purple)
 }
 
-.payment-input:focus { outline: none; border-color: var(--purple); }
-
-.footer-note {
-    text-align: center;
-    color: var(--muted);
-    font-size: 10px;
-    padding: 20px 0 10px;
-    border-top: 1px solid var(--border);
-    margin-top: 16px;
+.mine-cell.safe{
+  background:rgba(93,240,162,.1);
+  border-color:var(--green);
+  animation:pop .28s
 }
 
-@media(max-width:400px) {
-    .games-grid { grid-template-columns: 1fr; }
+.mine-cell.mine{
+  background:rgba(255,93,115,.12);
+  border-color:var(--red);
+  animation:boom .38s
+}
+
+.meter{
+  height:5px;
+  background:#20172b;
+  border-radius:99px;
+  overflow:hidden;
+  margin:10px 0
+}
+
+.meter div{
+  height:100%;
+  width:0;
+  background:
+    linear-gradient(
+      90deg,
+      var(--cyan),
+      var(--green)
+    );
+  transition:.35s
+}
+
+/* SLOTS */
+.slot-wrap{
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#090611;
+  position:relative;
+  overflow:hidden
+}
+
+.slot-wrap.winfx{
+  animation:winflash .7s
+}
+
+.reels{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px
+}
+
+.reel{
+  height:92px;
+  border:2px solid #342642;
+  border-radius:14px;
+  background:
+    linear-gradient(
+      180deg,
+      #1d1528,
+      #0d0914
+    );
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:45px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:inset 0 0 25px rgba(0,0,0,.35)
+}
+
+.reel.spin{
+  animation:reelShake .09s steps(2) infinite
+}
+
+.reel.win{
+  border-color:var(--gold);
+  box-shadow:0 0 28px rgba(255,211,110,.28);
+  animation:jackpot .55s ease 2
+}
+
+.slot-status{
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+  min-height:20px;
+  margin:9px 0
+}
+
+/* COIN */
+.coin{
+  width:118px;
+  height:118px;
+  margin:17px auto;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:58px;
+  background:
+    radial-gradient(
+      circle,
+      #3b2a53,
+      #151020
+    );
+  border:4px solid #5e4b76;
+  box-shadow:0 0 35px rgba(128,103,255,.18)
+}
+
+.coin.flip{
+  animation:flip .8s cubic-bezier(.25,.8,.25,1)
+}
+
+.choice{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px
+}
+
+/* DICE */
+.dice-stage{
+  height:180px;
+  display:grid;
+  place-items:center;
+  position:relative;
+  margin:5px 0 3px
+}
+
+.dice-cube{
+  font-size:78px;
+  filter:drop-shadow(0 18px 22px rgba(0,0,0,.45))
+}
+
+.dice-cube.rolling{
+  animation:dicePremium 1.25s cubic-bezier(.2,.75,.2,1)
+}
+
+.dice-cube.result{
+  animation:diceResult .5s cubic-bezier(.2,.8,.2,1)
+}
+
+.dice-odds{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px
+}
+
+.dice-choice{
+  padding:13px;
+  border-radius:13px;
+  background:#171022;
+  border:1px solid var(--line);
+  transition:.2s
+}
+
+.dice-choice b{
+  display:block;
+  font-size:13px
+}
+
+.dice-choice small{
+  display:block;
+  color:var(--muted);
+  font-size:9px;
+  margin-top:3px
+}
+
+/* CONFETTI */
+.confetti{
+  position:fixed;
+  z-index:250;
+  width:7px;
+  height:13px;
+  top:45%;
+  left:50%;
+  pointer-events:none;
+  animation:confetti 1.1s ease-out forwards
+}
+
+/* ANIMATIONS */
+@keyframes pulse{
+  50%{
+    opacity:.25;
+    transform:scale(.75)
+  }
+}
+
+@keyframes shine{
+  0%{
+    transform:translateX(-70%)
+  }
+  35%,100%{
+    transform:translateX(70%)
+  }
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(7px)
+  }
+  to{
+    opacity:1;
+    transform:none
+  }
+}
+
+@keyframes sheet{
+  from{
+    opacity:0;
+    transform:translateY(35px)
+  }
+  to{
+    opacity:1;
+    transform:none
+  }
+}
+
+@keyframes pop{
+  0%{
+    transform:scale(.75);
+    opacity:.3
+  }
+  70%{
+    transform:scale(1.08)
+  }
+  100%{
+    transform:scale(1)
+  }
+}
+
+@keyframes boom{
+  0%{
+    transform:scale(.7) rotate(-4deg)
+  }
+  45%{
+    transform:scale(1.13) rotate(4deg)
+  }
+  100%{
+    transform:scale(1)
+  }
+}
+
+@keyframes reelShake{
+  50%{
+    transform:translateY(5px);
+    filter:blur(1px)
+  }
+  100%{
+    transform:translateY(-5px);
+    filter:blur(1.5px)
+  }
+}
+
+@keyframes jackpot{
+  50%{
+    transform:scale(1.09);
+    filter:brightness(1.35)
+  }
+}
+
+@keyframes winflash{
+  50%{
+    box-shadow:0 0 70px rgba(255,211,110,.32)
+  }
+}
+
+@keyframes flip{
+  50%{
+    transform:rotateY(900deg) scale(1.08)
+  }
+  100%{
+    transform:rotateY(1800deg)
+  }
+}
+
+@keyframes dicePremium{
+  0%{
+    transform:translateY(0) rotateX(0) rotateY(0) rotateZ(0) scale(.92)
+  }
+  18%{
+    transform:translateY(-32px) rotateX(220deg) rotateY(170deg) rotateZ(80deg) scale(1.08)
+  }
+  42%{
+    transform:translateY(-15px) rotateX(500deg) rotateY(390deg) rotateZ(190deg) scale(1.04)
+  }
+  68%{
+    transform:translateY(-7px) rotateX(760deg) rotateY(620deg) rotateZ(300deg) scale(1.02)
+  }
+  86%{
+    transform:translateY(0) rotateX(920deg) rotateY(780deg) rotateZ(350deg) scale(1)
+  }
+  100%{
+    transform:translateY(0) rotateX(1080deg) rotateY(900deg) rotateZ(360deg) scale(1)
+  }
+}
+
+@keyframes diceResult{
+  0%{
+    transform:scale(.8) rotateZ(-7deg)
+  }
+  55%{
+    transform:scale(1.13) rotateZ(4deg)
+  }
+  100%{
+    transform:scale(1) rotateZ(0)
+  }
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg)
+  }
+}
+
+@keyframes confetti{
+  to{
+    transform:
+      translate(var(--x),var(--y))
+      rotate(720deg);
+    opacity:0
+  }
+}
+
+@media(max-width:390px){
+  .games{
+    grid-template-columns:1fr
+  }
+
+  .reel{
+    height:78px;
+    font-size:38px
+  }
 }
 </style>
 </head>
+
 <body>
 
 <div class="app">
 
-<!-- HEADER -->
-<div class="header">
-    <div class="header-top">
-        <div class="logo">LIMBO <span style="-webkit-text-fill-color:var(--pink);background:none;">///</span></div>
-        <div class="online-badge">
-            <span class="dot"></span>
-            <span>ONLINE 24/7</span>
-        </div>
-    </div>
+<header class="header">
 
-    <div class="balance-box">
-        <small>💰 Баланс</small>
-        <div class="amount"><span id="balanceDisplay">10 000</span> ₽</div>
-        <div class="btn-group">
-            <button class="btn-deposit" onclick="openDeposit()">💎 Депозит</button>
-            <button class="btn-withdraw" onclick="openWithdraw()">💳 Вывод</button>
-        </div>
-    </div>
+<div class="header-row">
+
+<div class="logo">
+CASINO LIMBO
 </div>
 
-<!-- NAV -->
-<div class="nav">
-    <button class="active" data-tab="games">🎮 Игры</button>
-    <button data-tab="history">📊 История</button>
-    <button data-tab="profile">👤 Профиль</button>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="content">
-
-    <!-- GAMES -->
-    <div id="gamesSection" class="section active">
-        <div style="padding:8px 0 12px;">
-            <h2 style="font-size:24px;">Играй <span style="background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">по-крупному.</span></h2>
-            <p style="color:var(--muted);font-size:13px;margin-top:4px;">Выбирай игру и забирай выигрыш.</p>
-        </div>
-
-        <div class="games-grid">
-            <div class="game-card" onclick="openGame('mines')">
-                <div class="icon">💣</div>
-                <b>MINES</b>
-                <small>От 1 до 24 мин. Открывай клетки.</small>
-            </div>
-            <div class="game-card" onclick="openGame('slots')">
-                <div class="icon">🎰</div>
-                <b>SLOTS</b>
-                <small>Пары, тройки и джекпот 777.</small>
-            </div>
-            <div class="game-card" onclick="openGame('coin')">
-                <div class="icon">🪙</div>
-                <b>COINFLIP</b>
-                <small>Орёл или решка. x2.</small>
-            </div>
-            <div class="game-card" onclick="openGame('dice')">
-                <div class="icon">🎲</div>
-                <b>DICE</b>
-                <small>Угадай сторону числа.</small>
-            </div>
-        </div>
-
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:8px;">
-            <div style="font-weight:700;font-size:13px;">📈 СЕССИЯ</div>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <small>Раунды</small>
-                    <b id="roundsCount">0</b>
-                </div>
-                <div class="stat-item">
-                    <small>Профит</small>
-                    <b id="profitDisplay">0 ₽</b>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- HISTORY -->
-    <div id="historySection" class="section">
-        <div style="padding:8px 0 12px;">
-            <h2 style="font-size:24px;">📊 История</h2>
-            <p style="color:var(--muted);font-size:13px;margin-top:4px;">Все твои раунды.</p>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;" id="historyList">
-            <div class="empty-state">📭 Пока нет игр</div>
-        </div>
-        <button class="btn btn-secondary" onclick="clearHistory()" style="margin-top:10px;">🗑 Очистить</button>
-    </div>
-
-    <!-- PROFILE -->
-    <div id="profileSection" class="section">
-        <div style="padding:8px 0 12px;">
-            <h2 style="font-size:24px;">👤 Профиль</h2>
-            <p style="color:var(--muted);font-size:13px;margin-top:4px;">Твои данные.</p>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#331c3b,#171124);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;">👑</div>
-                <div>
-                    <div style="font-weight:700;" id="profileName">Player</div>
-                    <div style="color:var(--muted);font-size:11px;">LIMBO CASINO</div>
-                </div>
-            </div>
-            <div class="profile-row"><span>Telegram ID</span><b id="profileId">—</b></div>
-            <div class="profile-row"><span>Username</span><b id="profileUsername">—</b></div>
-            <div class="profile-row"><span>Баланс</span><b><span id="profileBalance">10 000</span> ₽</b></div>
-            <div class="profile-row"><span>Раундов</span><b id="profileRounds">0</b></div>
-        </div>
-        <button class="btn btn-secondary" onclick="resetDemo()" style="margin-top:10px;">🔄 Сбросить прогресс</button>
-    </div>
-
-    <div class="footer-note">⚡ LIMBO CASINO — 18+ Играй ответственно</div>
+<div class="online">
+<i></i>
+<span id="onlineCount">1 024</span>
+ONLINE
 </div>
 
 </div>
+
+<div class="balance">
+
+<div class="label">
+💰 Баланс
+</div>
+
+<div class="amount">
+<span id="balance">0</span> ₽
+</div>
+
+<div class="actions">
+
+<button
+class="btn primary glow"
+id="depositBtn">
+💎 Пополнить
+</button>
+
+<button
+class="btn secondary"
+id="withdrawBtn">
+💳 Вывод
+</button>
+
+</div>
+
+</div>
+
+</header>
+
+
+<nav class="nav">
+
+<button
+class="active"
+data-tab="games">
+🎮 Игры
+</button>
+
+<button
+data-tab="history">
+📊 История
+</button>
+
+<button
+data-tab="profile">
+👤 Профиль
+</button>
+
+</nav>
+
+
+<main>
+
+<!-- GAMES -->
+
+<section
+id="gamesSection"
+class="section active">
+
+<div class="hero">
+
+<h1>
+Играй
+<span class="gradient">
+по-крупному.
+</span>
+</h1>
+
+<p>
+Выбирай игру, делай ставку и забирай выигрыш.
+</p>
+
+</div>
+
+
+<div class="games">
+
+<button
+class="game"
+data-game="mines">
+
+<div class="icon">
+💣
+</div>
+
+<b>
+MINES
+</b>
+
+<small>
+Открывай клетки и забирай раунд.
+</small>
+
+</button>
+
+
+<button
+class="game"
+data-game="slots">
+
+<div class="icon">
+🎰
+</div>
+
+<b>
+SLOTS
+</b>
+
+<small>
+Три барабана с эффектным спином.
+</small>
+
+</button>
+
+
+<button
+class="game"
+data-game="coin">
+
+<div class="icon">
+🪙
+</div>
+
+<b>
+COINFLIP
+</b>
+
+<small>
+Орёл или решка.
+</small>
+
+</button>
+
+
+<button
+class="game"
+data-game="dice">
+
+<div class="icon">
+🎲
+</div>
+
+<b>
+DICE
+</b>
+
+<small>
+Высокое или низкое число.
+</small>
+
+</button>
+
+</div>
+
+
+<div class="panel">
+
+<div class="panel-title">
+
+<span>
+📈 СЕССИЯ
+</span>
+
+<span
+class="muted"
+id="sessionNet">
++0 ₽
+</span>
+
+</div>
+
+
+<div class="stats">
+
+<div class="stat">
+
+<small>
+Раунды
+</small>
+
+<b id="rounds">
+0
+</b>
+
+</div>
+
+
+<div class="stat">
+
+<small>
+Профит
+</small>
+
+<b id="profit">
+0 ₽
+</b>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- HISTORY -->
+
+<section
+id="historySection"
+class="section">
+
+<div class="hero">
+
+<h1>
+📊 История
+</h1>
+
+<p>
+Все игры и заявки на пополнение.
+</p>
+
+</div>
+
+
+<div
+class="panel history"
+id="historyList">
+
+<div class="empty">
+📭 Пока нет действий
+</div>
+
+</div>
+
+
+<button
+class="btn secondary"
+style="width:100%;margin-top:9px"
+id="clearHistory">
+
+🗑 Очистить историю
+
+</button>
+
+</section>
+
+
+<!-- PROFILE -->
+
+<section
+id="profileSection"
+class="section">
+
+<div class="hero">
+
+<h1>
+👤 Профиль
+</h1>
+
+<p>
+Данные пользователя Telegram.
+</p>
+
+</div>
+
+
+<div class="panel">
+
+<div class="profile-head">
+
+<div class="avatar">
+👑
+</div>
+
+<div>
+
+<b id="profileName">
+Player
+</b>
+
+<div
+class="muted"
+style="font-size:10px;margin-top:3px">
+
+CASINO LIMBO PLAYER
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="row">
+
+<span>
+Telegram ID
+</span>
+
+<b id="profileId">
+—
+</b>
+
+</div>
+
+
+<div class="row">
+
+<span>
+Username
+</span>
+
+<b id="profileUsername">
+—
+</b>
+
+</div>
+
+
+<div class="row">
+
+<span>
+Баланс
+</span>
+
+<b>
+<span id="profileBalance">
+0
+</span>
+ ₽
+</b>
+
+</div>
+
+
+<div class="row">
+
+<span>
+Раундов
+</span>
+
+<b id="profileRounds">
+0
+</b>
+
+</div>
+
+</div>
+
+
+<button
+class="btn secondary"
+style="width:100%;margin-top:9px"
+id="resetDemo">
+
+🔄 Сбросить прогресс
+
+</button>
+
+</section>
+
+</main>
+
+
+<div class="footer">
+
+⚡ CASINO LIMBO — 18+ Играй ответственно
+
+</div>
+
+</div>
+
 
 <!-- MODAL -->
-<div class="modal" id="gameModal">
-    <div class="sheet">
-        <div class="handle"></div>
-        <button class="close" onclick="closeModal()">×</button>
-        <div id="gameContent"></div>
-    </div>
+
+<div
+class="modal"
+id="modal">
+
+<div class="sheet">
+
+<div class="handle"></div>
+
+<button
+class="close"
+id="close">
+×
+</button>
+
+<div id="modalContent"></div>
+
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toastEl"></div>
+</div>
+
+
+<div
+class="toast"
+id="toast">
+</div>
+
 
 <script>
-// ===== TELEGRAM =====
-const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
 
-// ===== STATE =====
-const USER = tg?.initDataUnsafe?.user || {};
-const STORAGE_KEY = 'limbo_casino_data';
+'use strict';
 
-let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-    balance: 10000,
-    rounds: 0,
-    net: 0,
-    history: []
+
+/* =========================================================
+   TELEGRAM
+========================================================= */
+
+const tg =
+window.Telegram?.WebApp || null;
+
+tg?.ready();
+tg?.expand?.();
+
+// Получаем реального пользователя
+const user = tg?.initDataUnsafe?.user || {};
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+const STORAGE =
+'limbo_casino_real_v1';
+
+const ADMIN_STORAGE =
+'limbo_admin_data';
+
+const DEFAULT = {
+  balance:0,
+  rounds:0,
+  net:0,
+  history:[],
+  deposits:[]
 };
 
-function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    updateUI();
-}
+let state = loadState();
+let adminData = loadAdminData();
 
-function updateUI() {
-    document.getElementById('balanceDisplay').textContent = formatNumber(state.balance);
-    document.getElementById('profileBalance').textContent = formatNumber(state.balance);
-    document.getElementById('roundsCount').textContent = state.rounds;
-    document.getElementById('profileRounds').textContent = state.rounds;
-    document.getElementById('profitDisplay').textContent = (state.net >= 0 ? '+' : '') + formatNumber(state.net) + ' ₽';
-    document.getElementById('profileId').textContent = USER.id || '—';
-    document.getElementById('profileUsername').textContent = USER.username ? '@' + USER.username : '—';
-    document.getElementById('profileName').textContent = [USER.first_name, USER.last_name].filter(Boolean).join(' ') || 'Player';
-    renderHistory();
-}
 
-function formatNumber(n) {
-    return new Intl.NumberFormat('ru-RU').format(Math.round(n));
-}
-
-function toast(msg) {
-    const el = document.getElementById('toastEl');
-    el.textContent = msg;
-    el.classList.add('show');
-    clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => el.classList.remove('show'), 2500);
-}
-
-function canBet(amount) {
-    if (amount < 10) { toast('Минимальная ставка 10 ₽'); return false; }
-    if (state.balance < amount) { toast('Недостаточно средств'); return false; }
-    return true;
-}
-
-function record(game, delta, label) {
-    state.rounds++;
-    state.net += delta;
-    state.history.unshift({
-        game,
-        delta,
-        label,
-        time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-    });
-    state.history = state.history.slice(0, 50);
-    saveState();
-}
-
-function renderHistory() {
-    const container = document.getElementById('historyList');
-    if (!state.history.length) {
-        container.innerHTML = '<div class="empty-state">📭 Пока нет игр</div>';
-        return;
-    }
-    container.innerHTML = state.history.map(item => `
-        <div class="history-item">
-            <div><b>${item.game}</b><div style="color:var(--muted);font-size:11px;margin-top:2px;">${item.time} · ${item.label}</div></div>
-            <b class="${item.delta >= 0 ? 'win' : 'loss'}">${item.delta >= 0 ? '+' : ''}${formatNumber(item.delta)} ₽</b>
-        </div>
-    `).join('');
-}
-
-// ===== NAV =====
-document.querySelectorAll('.nav button').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(this.dataset.tab + 'Section').classList.add('active');
-    });
-});
-
-// ===== MODAL =====
-function openModal(html) {
-    document.getElementById('gameContent').innerHTML = html;
-    document.getElementById('gameModal').classList.add('open');
-}
-
-function closeModal() {
-    document.getElementById('gameModal').classList.remove('open');
-}
-
-document.getElementById('gameModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-});
-
-// ===== DEPOSIT =====
-function openDeposit() {
-    openModal(`
-        <div style="font-size:22px;font-weight:900;">💎 Пополнение</div>
-        <div style="color:var(--muted);font-size:13px;margin:4px 0 12px;">Пополни баланс через Telegram Stars</div>
-        <div style="background:#0b0818;border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Сумма</div>
-            <div class="bet-bar">
-                ${[100, 500, 1000, 5000].map(n => `
-                    <button onclick="document.getElementById('depositAmount').value = ${n}">${n}</button>
-                `).join('')}
-            </div>
-            <input type="number" id="depositAmount" class="payment-input" placeholder="Введите сумму" value="100" min="10">
-            <button class="btn btn-primary" onclick="processDeposit()">💳 Пополнить через Stars</button>
-            <div style="color:var(--muted);font-size:11px;margin-top:8px;">1 Star = 1 ₽</div>
-        </div>
-        <button class="btn btn-secondary" onclick="closeModal()">Закрыть</button>
-    `);
-}
-
-function processDeposit() {
-    const amount = parseInt(document.getElementById('depositAmount').value);
-    if (!amount || amount < 10) { toast('Введите сумму от 10 ₽'); return; }
-
-    if (tg && tg.showPopup) {
-        tg.showPopup({
-            title: '💎 Пополнение',
-            message: `Пополнить баланс на ${amount} ₽ через Telegram Stars?`,
-            buttons: [
-                { id: 'cancel', type: 'cancel', text: 'Отмена' },
-                { id: 'pay', type: 'ok', text: 'Оплатить' }
-            ]
-        }, (btnId) => {
-            if (btnId === 'pay') {
-                toast(`✅ Запрос на ${amount} ₽ отправлен боту`);
-                if (tg && tg.sendData) {
-                    tg.sendData(JSON.stringify({ type: 'deposit', amount }));
-                }
-                closeModal();
-            }
-        });
-    } else {
-        // Демо-режим
-        state.balance += amount;
-        record('DEPOSIT', amount, 'Пополнение');
-        toast(`✅ Баланс пополнен на ${formatNumber(amount)} ₽`);
-        closeModal();
-    }
-}
-
-// ===== WITHDRAW =====
-function openWithdraw() {
-    openModal(`
-        <div style="font-size:22px;font-weight:900;">💳 Вывод</div>
-        <div style="color:var(--muted);font-size:13px;margin:4px 0 12px;">Вывод на твой Telegram кошелёк</div>
-        <div style="background:#0b0818;border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Сумма вывода</div>
-            <input type="number" id="withdrawAmount" class="payment-input" placeholder="Введите сумму" value="100" min="10">
-            <div style="color:var(--muted);font-size:11px;margin:4px 0 8px;">Доступно: ${formatNumber(state.balance)} ₽</div>
-            <button class="btn btn-primary" onclick="processWithdraw()">💳 Запросить вывод</button>
-        </div>
-        <button class="btn btn-secondary" onclick="closeModal()">Закрыть</button>
-    `);
-}
-
-function processWithdraw() {
-    const amount = parseInt(document.getElementById('withdrawAmount').value);
-    if (!amount || amount < 10) { toast('Введите сумму от 10 ₽'); return; }
-    if (amount > state.balance) { toast('Недостаточно средств'); return; }
-
-    if (tg && tg.showPopup) {
-        tg.showPopup({
-            title: '💳 Вывод',
-            message: `Вывести ${amount} ₽ на твой Telegram кошелёк?`,
-            buttons: [
-                { id: 'cancel', type: 'cancel', text: 'Отмена' },
-                { id: 'withdraw', type: 'ok', text: 'Вывести' }
-            ]
-        }, (btnId) => {
-            if (btnId === 'withdraw') {
-                state.balance -= amount;
-                record('WITHDRAW', -amount, 'Вывод');
-                toast(`✅ Запрос на вывод ${formatNumber(amount)} ₽ отправлен`);
-                if (tg && tg.sendData) {
-                    tg.sendData(JSON.stringify({ type: 'withdraw', amount }));
-                }
-                closeModal();
-                saveState();
-            }
-        });
-    } else {
-        state.balance -= amount;
-        record('WITHDRAW', -amount, 'Вывод');
-        toast(`✅ Выведено ${formatNumber(amount)} ₽`);
-        closeModal();
-        saveState();
-    }
-}
-
-// ===== GAMES =====
-function openGame(type) {
-    const games = {
-        mines: minesHTML,
-        slots: slotsHTML,
-        coin: coinHTML,
-        dice: diceHTML
+function loadState(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(STORAGE)||'null');
+    return {
+      ...DEFAULT,
+      ...(saved||{}),
+      history: saved?.history || [],
+      deposits: saved?.deposits || []
     };
-    openModal(games[type]());
-    if (type === 'mines') initMines();
+  }catch{
+    return {...DEFAULT, history:[], deposits:[]};
+  }
 }
 
-// ===== MINES =====
-let minesState = { bet: 10, count: 3, over: false, safe: 0, map: [] };
+function saveState(){
+  localStorage.setItem(STORAGE, JSON.stringify(state));
+  render();
+}
 
-function minesHTML() {
-    return `
-        <div style="font-size:22px;font-weight:900;">💣 MINES</div>
-        <div style="color:var(--muted);font-size:13px;margin:4px 0 12px;">Выбери количество мин и открывай клетки.</div>
+function loadAdminData(){
+  try{
+    return JSON.parse(localStorage.getItem(ADMIN_STORAGE)||'null') || {
+      adminId: null,
+      adminUsername: null
+    };
+  }catch{
+    return { adminId: null, adminUsername: null };
+  }
+}
 
-        <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Ставка</div>
-        <div class="bet-bar">
-            ${[10, 50, 100, 500].map(n => `
-                <button class="${n === minesState.bet ? 'active' : ''}" onclick="minesState.bet=${n}; updateMinesBet()">${n}</button>
-            `).join('')}
-        </div>
+function saveAdminData(){
+  localStorage.setItem(ADMIN_STORAGE, JSON.stringify(adminData));
+}
 
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin:6px 0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <span style="color:var(--muted);font-size:10px;text-transform:uppercase;">Мины</span>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <button style="width:32px;height:32px;border-radius:8px;background:#1a142a;border:1px solid var(--border);color:white;font-size:18px;cursor:pointer;" onclick="changeMines(-1)">−</button>
-                    <span style="font-weight:900;font-size:18px;color:var(--pink);min-width:30px;text-align:center;" id="minesCountDisplay">${minesState.count}</span>
-                    <button style="width:32px;height:32px;border-radius:8px;background:#1a142a;border:1px solid var(--border);color:white;font-size:18px;cursor:pointer;" onclick="changeMines(1)">+</button>
-                </div>
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function $(selector){
+  return document.querySelector(selector);
+}
+
+function fmt(number){
+  return new Intl.NumberFormat('ru-RU').format(Math.round(number));
+}
+
+function money(number){
+  return `${number>=0?'+':''}${fmt(number)} ₽`;
+}
+
+function esc(value){
+  return String(value??'').replace(/[&<>"']/g, m=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+  }[m]));
+}
+
+function toast(message){
+  const element = $('#toast');
+  element.textContent = message;
+  element.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(()=>element.classList.remove('show'), 2500);
+}
+
+function openModal(html){
+  $('#modalContent').innerHTML = html;
+  $('#modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  $('#modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+$('#close').onclick = closeModal;
+$('#modal').onclick = event=>{
+  if(event.target.id==='modal') closeModal();
+};
+
+
+/* =========================================================
+   TELEGRAM USER
+========================================================= */
+
+function updateUser(){
+  $('#profileId').textContent = user.id || '—';
+  $('#profileUsername').textContent = user.username ? '@'+user.username : '—';
+  $('#profileName').textContent = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Player';
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function render(){
+  $('#balance').textContent = fmt(state.balance);
+  $('#profileBalance').textContent = fmt(state.balance);
+  $('#rounds').textContent = state.rounds;
+  $('#profileRounds').textContent = state.rounds;
+  $('#profit').textContent = money(state.net);
+  $('#sessionNet').textContent = money(state.net);
+
+  const history = $('#historyList');
+
+  if(!state.history.length){
+    history.innerHTML = `<div class="empty">📭 Пока нет действий</div>`;
+  }else{
+    history.innerHTML = state.history.map(item=>{
+      let color = item.delta>=0 ? 'win' : 'loss';
+      if(item.type==='deposit'){
+        color = item.status==='pending' ? 'pending' : 'win';
+      }
+      return `
+        <div class="history-item">
+          <div>
+            <b>${esc(item.game)}</b>
+            <div class="muted" style="font-size:9px;margin-top:3px">
+              ${esc(item.time)} · ${esc(item.label)}
             </div>
-            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;">
-                ${[1,3,5,7,10,15,20].map(n => `
-                    <button class="${n === minesState.count ? 'active' : ''}" style="padding:6px;border-radius:6px;background:${n === minesState.count ? 'rgba(255,63,159,0.15)' : '#1a142a'};border:1px solid ${n === minesState.count ? 'var(--pink)' : 'var(--border)'};color:${n === minesState.count ? 'white' : 'var(--muted)'};font-size:11px;cursor:pointer;" onclick="setMinesCount(${n})">${n}</button>
-                `).join('')}
-            </div>
+          </div>
+          <b class="${color}">${money(item.delta)}</b>
         </div>
+      `;
+    }).join('');
+  }
 
-        <div class="mine-grid" id="mineGrid"></div>
-
-        <div style="background:#0b0818;border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;">
-            <div style="color:var(--muted);font-size:10px;text-transform:uppercase;">Множитель</div>
-            <div style="font-size:24px;font-weight:900;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;" id="mineMultiplier">x1.00</div>
-        </div>
-
-        <div style="height:4px;background:#1a142a;border-radius:99px;margin:10px 0;overflow:hidden;">
-            <div style="height:100%;width:0%;background:var(--green);transition:width 0.2s;" id="mineProgress"></div>
-        </div>
-
-        <div style="text-align:center;color:var(--muted);font-size:12px;min-height:24px;" id="mineMsg">Настрой и начинай</div>
-
-        <button class="btn btn-primary" onclick="startMines()" id="minesStartBtn">▶ Начать раунд</button>
-        <button class="btn btn-secondary" onclick="closeModal()" style="margin-top:6px;">Закрыть</button>
-    `;
+  updateUser();
 }
 
-function updateMinesBet() {
-    document.querySelectorAll('.bet-bar button').forEach(b => {
-        b.classList.toggle('active', parseInt(b.textContent) === minesState.bet);
-    });
+
+/* =========================================================
+   RECORD GAME
+========================================================= */
+
+function recordGame(game, delta, label){
+  state.rounds++;
+  state.net += delta;
+  state.history.unshift({
+    type:'game',
+    game,
+    delta,
+    label,
+    time:new Date().toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'})
+  });
+  state.history = state.history.slice(0, 50);
+  saveState();
 }
 
-function setMinesCount(n) {
-    if (minesState.over) return;
-    minesState.count = Math.max(1, Math.min(24, n));
-    document.getElementById('minesCountDisplay').textContent = minesState.count;
-    document.querySelectorAll('.mine-settings .grid button').forEach(b => {
-        b.classList.toggle
+
+/* =========================================================
+   REAL DEPOSIT SYSTEM
+========================================================= */
+
+let selectedDepositAmount = 100;
+
+function openDeposit(){
+  selectedDepositAmount = 100;
+
+  openModal(`
+    <div class="modal-title">💎 Пополнение</div>
+    <div class="modal-sub">Пополни баланс для игры. Минимальная сумма: 100 ₽</
