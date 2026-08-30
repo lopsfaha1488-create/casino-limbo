@@ -1,362 +1,105 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CASINO LIMBO</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-color: #0d0b18;
-            --card-bg: #161228;
-            --accent-purple: #7b2cbf;
-            --accent-glow: #9d4edd;
-            --text-color: #ffffff;
-            --text-dim: #a0a0b0;
-            --green-btn: #2ec4b6;
-            --red-btn: #e63946;
-        }
+import asyncio
+import logging
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import CommandStart
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            user-select: none;
-        }
+# -------------------------------------------------------------
+# НАСТРОЙКИ (Данные уже вставлены)
+# -------------------------------------------------------------
+BOT_TOKEN = "8733911430:AAF0y4vZM-E1JoiS9PkgHSF8aBE5BcZsfzY"
+WEBAPP_URL = "https://lopsfaha1488-create.github.io/casino-limbo/"
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            min-height: 100vh;
-        }
+logging.basicConfig(level=logging.INFO)
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
 
-        .header {
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(157, 78, 221, 0.2);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
+# -------------------------------------------------------------
+# КЛАВИАТУРЫ В СТИЛЕ LIMBO
+# -------------------------------------------------------------
+def get_main_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="🚀 ИГРАТЬ В CASINO LIMBO",
+                    web_app=WebAppInfo(url=WEBAPP_URL)
+                )
+            ],
+            [
+                InlineKeyboardButton(text="💎 Пополнение", callback_data="btn_deposit"),
+                InlineKeyboardButton(text="💳 Вывод", callback_data="btn_withdraw")
+            ],
+            [
+                InlineKeyboardButton(text="📊 Статистика", callback_data="btn_stats"),
+                InlineKeyboardButton(text="💬 Поддержка", url="https://t.me/telegram")
+            ]
+        ]
+    )
 
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+# -------------------------------------------------------------
+# ОБРАБОТЧИКИ КОМАНД И КНОПОК
+# -------------------------------------------------------------
+@dp.message(CommandStart())
+async def cmd_start(message: types.Message):
+    user_name = message.from_user.first_name or "Игрок"
+    
+    caption_text = (
+        f"👑 <b>Добро пожаловать в CASINO LIMBO, {user_name}!</b>\n\n"
+        f"⚡ <b>Самое стильное мини-приложение прямо в Telegram:</b>\n"
+        f"💣 <b>MINES</b> — Открывай ячейки и забирай куш\n"
+        f"🎰 <b>SLOTS</b> — Крути барабаны и лови джекпот\n"
+        f"🪙 <b>COINFLIP</b> — Испытай удачу на орёл/решка\n"
+        f"🎲 <b>DICE</b> — Угадывай числа и забирай x1.9\n\n"
+        f"💰 <i>Начни с приветственного демо-баланса 1 000 ₽!</i>\n\n"
+        f"Жми кнопку ниже, чтобы запустить приложение 👇"
+    )
+    
+    await message.answer(
+        text=caption_text,
+        parse_mode="HTML",
+        reply_markup=get_main_keyboard()
+    )
 
-        .username {
-            font-weight: bold;
-            font-size: 16px;
-            color: var(--accent-glow);
-        }
+@dp.callback_query(lambda c: c.data == "btn_deposit")
+async def process_deposit(callback: types.CallbackQuery):
+    await callback.answer()
+    await callback.message.answer(
+        "💎 <b>Пополнение баланса</b>\n\n"
+        "Вы можете пополнить баланс через <b>Т-Банк</b> или <b>USDT TRC20</b>.\n"
+        "Откройте мини-приложение и нажмите кнопку <b>«💎 Пополнить»</b> на главном экране.",
+        parse_mode="HTML",
+        reply_markup=get_main_keyboard()
+    )
 
-        .balance {
-            font-size: 20px;
-            font-weight: 800;
-        }
+@dp.callback_query(lambda c: c.data == "btn_withdraw")
+async def process_withdraw(callback: types.CallbackQuery):
+    await callback.answer()
+    await callback.message.answer(
+        "💳 <b>Вывод средств</b>\n\n"
+        "Создание заявок на вывод доступно прямо в мини-приложении.\n"
+        "Откройте WebApp и перейдите во вкладку <b>«💳 Вывод»</b>.",
+        parse_mode="HTML",
+        reply_markup=get_main_keyboard()
+    )
 
-        .nav-tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+@dp.callback_query(lambda c: c.data == "btn_stats")
+async def process_stats(callback: types.CallbackQuery):
+    await callback.answer()
+    await callback.message.answer(
+        "📊 <b>Твоя статистика</b>\n\n"
+        "Вся история игр, профит и текущая сессия синхронизируются внутри приложения.\n"
+        "Загляни во вкладку <b>«📊 История»</b> или <b>«👤 Профиль»</b> в WebApp!",
+        parse_mode="HTML",
+        reply_markup=get_main_keyboard()
+    )
 
-        .tab-btn {
-            background: var(--card-bg);
-            border: 1px solid rgba(157, 78, 221, 0.3);
-            color: var(--text-color);
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+# -------------------------------------------------------------
+# ЗАПУСК БОТА
+# -------------------------------------------------------------
+async def main():
+    print("⚡ Бот CASINO LIMBO успешно запущен!")
+    await dp.start_polling(bot)
 
-        .tab-btn.active {
-            background: var(--accent-purple);
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(157, 78, 221, 0.4);
-        }
-
-        .section {
-            display: none;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid rgba(157, 78, 221, 0.2);
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .section.active {
-            display: flex;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        label {
-            font-size: 13px;
-            color: var(--text-dim);
-        }
-
-        input {
-            background: #090710;
-            border: 1px solid rgba(157, 78, 221, 0.4);
-            border-radius: 10px;
-            padding: 12px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-        }
-
-        input:disabled {
-            opacity: 0.6;
-            border-color: #444;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #7b2cbf, #9d4edd);
-            border: none;
-            color: white;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4);
-        }
-
-        .submit-btn:active {
-            transform: scale(0.98);
-        }
-
-        .card-status {
-            font-size: 12px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: rgba(46, 196, 182, 0.1);
-            color: #2ec4b6;
-            border: 1px solid rgba(46, 196, 182, 0.3);
-        }
-
-        .games-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .game-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(157, 78, 221, 0.2);
-            border-radius: 14px;
-            padding: 20px;
-            text-align: center;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="header">
-        <div class="user-info">
-            <span class="username" id="userNameDisplay">Игрок</span>
-            <span class="balance" id="userBalanceDisplay">1 000 ₽</span>
-        </div>
-    </div>
-
-    <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('depositTab')">💎 Пополнить</button>
-        <button class="tab-btn" onclick="switchTab('withdrawTab')">💳 Вывод</button>
-    </div>
-
-    <!-- СЕКЦИЯ ПОПОЛНЕНИЯ -->
-    <div id="depositTab" class="section active">
-        <h3 style="color: var(--accent-glow)">Пополнение баланса</h3>
-        <p style="font-size: 12px; color: var(--text-dim)">Минимальная сумма пополнения — 1 000 ₽</p>
-
-        <div class="form-group">
-            <label>Способ оплаты</label>
-            <input type="text" value="Карта" disabled>
-        </div>
-
-        <div class="form-group">
-            <label>Номер вашей банковской карты</label>
-            <input type="text" id="depCardInput" placeholder="0000 0000 0000 0000" maxlength="19">
-            <span id="boundCardNotice" class="card-status" style="display:none;"></span>
-        </div>
-
-        <div class="form-group">
-            <label>Сумма пополнения (₽)</label>
-            <input type="number" id="depAmountInput" placeholder="1000" min="1000">
-        </div>
-
-        <button class="submit-btn" onclick="submitDeposit()">Отправить заявку</button>
-    </div>
-
-    <!-- СЕКЦИЯ ВЫВОДА -->
-    <div id="withdrawTab" class="section">
-        <h3 style="color: var(--accent-glow)">Вывод средств</h3>
-
-        <div id="withdrawContent">
-            <div class="form-group">
-                <label>Привязанная карта для вывода</label>
-                <input type="text" id="withCardInput" disabled placeholder="Карта не привязана">
-            </div>
-
-            <div class="form-group">
-                <label>Сумма вывода (₽)</label>
-                <input type="number" id="withAmountInput" placeholder="1000">
-            </div>
-
-            <button class="submit-btn" onclick="submitWithdraw()">Запросить вывод</button>
-        </div>
-    </div>
-
-    <!-- ИГРЫ -->
-    <h3 style="margin-top: 10px;">Игры Limbo</h3>
-    <div class="games-grid">
-        <div class="game-card">💣<br>MINES</div>
-        <div class="game-card">🎰<br>SLOTS</div>
-        <div class="game-card">🪙<br>COINFLIP</div>
-        <div class="game-card">🎲<br>DICE</div>
-    </div>
-
-    <script>
-        const BOT_TOKEN = "8733911430:AAF0y4vZM-E1JoiS9PkgHSF8aBE5BcZsfzY";
-        const ADMIN_ID = "8507520917";
-
-        let tg = window.Telegram?.WebApp;
-        if (tg) tg.expand();
-
-        const user = tg?.initDataUnsafe?.user || { id: "8507520917", first_name: "Игрок" };
-        document.getElementById('userNameDisplay').innerText = user.first_name;
-
-        // Загрузка привязанной карты
-        function loadBoundCard() {
-            const savedCard = localStorage.getItem('bound_card');
-            const depCardInput = document.getElementById('depCardInput');
-            const withCardInput = document.getElementById('withCardInput');
-            const boundNotice = document.getElementById('boundCardNotice');
-
-            if (savedCard) {
-                depCardInput.value = savedCard;
-                depCardInput.disabled = true;
-                boundNotice.innerText = "✓ Карта привязана к аккаунту";
-                boundNotice.style.display = "block";
-                
-                withCardInput.value = savedCard;
-            } else {
-                withCardInput.value = "Сначала сделайте депозит!";
-            }
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-            loadBoundCard();
-        }
-
-        // Отправка сообщения в Telegram админу через API
-        async function sendToAdmin(text) {
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-            try {
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: ADMIN_ID,
-                        text: text,
-                        parse_mode: 'HTML'
-                    })
-                });
-                return res.ok;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        // Обработка Депозита
-        async function submitDeposit() {
-            const cardInput = document.getElementById('depCardInput').value.trim();
-            const amountInput = parseFloat(document.getElementById('depAmountInput').value);
-
-            if (!cardInput || cardInput.length < 16) {
-                alert("Укажите корректный номер карты (не менее 16 цифр)!");
-                return;
-            }
-
-            if (isNaN(amountInput) || amountInput < 1000) {
-                alert("Минимальная сумма депозита — 1 000 ₽!");
-                return;
-            }
-
-            // Привязываем карту при первом пополнении
-            if (!localStorage.getItem('bound_card')) {
-                localStorage.setItem('bound_card', cardInput);
-            }
-
-            const msg = `📥 <b>ЗАЯВКА НА ДЕПОЗИТ</b>\n\n` +
-                        `👤 <b>Игрок:</b> ${user.first_name} (ID: <code>${user.id}</code>)\n` +
-                        `💳 <b>Карта:</b> <code>${cardInput}</code>\n` +
-                        `💰 <b>Сумма:</b> ${amountInput} ₽`;
-
-            const success = await sendToAdmin(msg);
-            if (success) {
-                alert("Заявка успешно отправлена! Ожидайте подтверждения.");
-                document.getElementById('depAmountInput').value = '';
-                loadBoundCard();
-            } else {
-                alert("Ошибка при отправке заявки.");
-            }
-        }
-
-        // Обработка Вывода
-        async function submitWithdraw() {
-            const boundCard = localStorage.getItem('bound_card');
-            const amountInput = parseFloat(document.getElementById('withAmountInput').value);
-
-            if (!boundCard) {
-                alert("Вывод недоступен! Сначала нужно пополнить баланс и привязать карту.");
-                return;
-            }
-
-            if (isNaN(amountInput) || amountInput <= 0) {
-                alert("Укажите корректную сумму для вывода!");
-                return;
-            }
-
-            const msg = `📤 <b>ЗАЯВКА НА ВЫВОД</b>\n\n` +
-                        `👤 <b>Игрок:</b> ${user.first_name} (ID: <code>${user.id}</code>)\n` +
-                        `💳 <b>Карта вывода:</b> <code>${boundCard}</code>\n` +
-                        `💰 <b>Сумма:</b> ${amountInput} ₽`;
-
-            const success = await sendToAdmin(msg);
-            if (success) {
-                alert("Заявка на вывод отправлена администратору!");
-                document.getElementById('withAmountInput').value = '';
-            } else {
-                alert("Ошибка при отправке заявки.");
-            }
-        }
-
-        loadBoundCard();
-    </script>
-</body>
-</html>
+if __name__ == "__main__":
+    asyncio.run(main())
